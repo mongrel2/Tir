@@ -1,0 +1,14 @@
+The Tir web framework is a simple micro framework written in
+Lua that uses Mongrel2 for the heavy lifting.  If you're installing
+this then you are using this at your own risk.
+
+
+INSTALL
+
+You need to have Lua 5.1, ZeroMQ, and LuaRocks installed.  Then do this:
+
+make install
+
+That should be it.  If you hit errors then let me know.
+
+

@@ -1,0 +1,143 @@
+#!/usr/bin/env lua
+
+require 'posix'
+require 'signal'
+
+TIME_LOOP = os.time()
+PIDS = {}
+
+function parse_args(arg)
+    if #arg == 0 then return nil end
+
+    local cmd = table.remove(arg, 1)
+    local settings = {}
+    local last_opt = nil
+
+    for i, opt in ipairs(arg) do
+        local token = opt:match("\-+([a-z\-]+)")
+
+        if token then
+            last_opt = token
+        else
+            settings[last_opt] = opt
+        end
+    end
+
+    return cmd, settings
+end
+
+
+
+signal.signal("SIGINT", function (...)
+    for script, pid in pairs(PIDS) do
+        posix.kill(pid)
+    end
+end)
+
+
+local function run_app(targets)
+    local pids = {}
+    local pid
+
+    print("\n--------------- APP --------------------")
+
+    for _, script in ipairs(targets) do
+        pid = posix.fork()
+        if pid == 0 then
+            -- in pid, run the script
+            posix.execp("lua", script)
+        else
+            print("Started " .. script .. " PID " .. pid)
+            pids[script] = pid
+        end
+    end
+
+    return pids
+end
+
+local function run_tests(test_dir, full)
+    print("\n---------------- TESTS -----------------")
+    local tests = posix.glob(test_dir .. "/**/*_tests.lua")
+
+    if tests then
+        local cmd = "tsc "
+        if full then cmd = cmd .. "-f " end
+
+        os.execute(cmd .. table.concat(tests, ' '))
+    else
+        print("\n-------------- NO TESTS ----------------")
+        print("  You must work at a startup.")
+    end
+end
+
+local function wait_on_children(pids)
+    local dead_count = 0
+    local child_count = 0
+    local p, msg, ret
+
+    -- gotta be a way to get the count of keys without looping
+    for k,v in pairs(pids) do child_count = child_count + 1 end
+
+    while dead_count < child_count do
+        for script, pid in pairs(pids) do
+            p, msg, ret = posix.wait(pid)
+
+            if p then
+                print("CHILD DIED " .. script .. " PID " .. pid ..":", msg)
+                dead_count = dead_count + 1
+            end
+        end
+    end
+end
+
+
+COMMANDS = {
+    test = function(settings)
+        local target = settings.from or "tests"
+        run_tests(target, settings.full ~= nil)
+    end,
+
+    start = function(settings)
+        local app = settings.app or "./app/*.lua"
+
+        while true do
+            local targets = assert(posix.glob(app))
+
+            COMMANDS.test(settings)
+
+            PIDS = run_app(targets)
+            wait_on_children(PIDS)
+
+            if os.time() - TIME_LOOP < 1 then
+                print("CYCLING TOO FAST, SLEEPING")
+                posix.sleep(10)
+            else
+                TIME_LOOP = os.time()
+            end
+        end
+    end,
+
+    help = function(settings)
+        print("AVAILABLE COMMANDS:")
+        for k,v in pairs(COMMANDS) do
+            print(k)
+        end
+    end,
+}
+
+
+function run(cmd, settings)
+    local cmd_to_run = COMMANDS[cmd]
+
+    if cmd_to_run then
+        cmd_to_run(settings)
+    else
+        print("ERROR: that's not a valid command")
+        print("USAGE: tir <command> <options>")
+    end
+end
+
+
+local cmd, settings = parse_args(arg)
+run(cmd, settings)
+

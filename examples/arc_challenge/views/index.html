@@ -1,0 +1,12 @@
+{( "header.html" )}
+
+<form action="/arc" method="POST">
+
+{% if form.errors then }}
+    <b>{{ form.errors }}</b>
+{% end %}
+
+<input name="msg"><input type="submit">
+</form>
+
+{( "footer.html" )}
