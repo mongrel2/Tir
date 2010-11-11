@@ -159,7 +159,7 @@ local VIEW_ACTIONS = {
     end,
 
     ['{{'] = function(code)
-        return ('table.insert(result, %s)'):format(code)
+        return ('result[#result+1] = %s'):format(code)
     end,
 
     ['{('] = function(code)
@@ -168,12 +168,12 @@ local VIEW_ACTIONS = {
                 children[%s] = Tir.view(%s)
             end
 
-            table.insert(result, children[%s](getfenv()))
+            result[#result+1] = children[%s](getfenv())
         ]]):format(code, code, code, code)
     end,
 
     ['{<'] = function(code)
-        return ('table.insert(result, Tir.escape(%s))'):format(code)
+        return ('result[#result+1] =  Tir.escape(%s)'):format(code)
     end,
 }
 
@@ -185,16 +185,16 @@ function compile_view(tmpl, name)
     local code = {'local result, children = {}, {}\n'}
 
     for text, block in string.gmatch(tmpl, "([^{]-)(%b{})") do
-        table.insert(code, ('table.insert(result, [[%s]])'):format(text))
+        code[#code+1] =  ('result[#result+1] = [[%s]]'):format(text)
 
         local act = VIEW_ACTIONS[block:sub(1,2)]
 
         if act then
-            table.insert(code, act(block:sub(3,-3)))
+            code[#code+1] = act(block:sub(3,-3))
         end
     end
 
-    table.insert(code, 'return table.concat(result)')
+    code[#code+1] = 'return table.concat(result)'
 
     code = table.concat(code, '\n')
     local func, err = loadstring(code, name)
@@ -309,7 +309,7 @@ function load_lines(source, firstline, lastline)
         i = i + 1
 
         if i >= firstline and i <= lastline then
-            table.insert(lines, ("%0.4d: %s"):format(i, line))
+            lines[#lines+1] = ("%0.4d: %s"):format(i, line)
         end
     end
 
