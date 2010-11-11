@@ -15,7 +15,7 @@ dist_build:
 	mkdir tmp
 	fossil zip trunk tmp/tir-${VERSION}.zip --name tir-${VERSION}
 	cd tmp && unzip tir-${VERSION}.zip && tar -czvf tir-${VERSION}.tar.gz tir-${VERSION}
-	cp rockspec/*.rockspec tmp
+	cp rockspec/tir-scm.rockspec tmp/tir-${VERSION}-${REVISION}.rockspec
 	md5sum tmp/tir-${VERSION}.tar.gz 
 
 dist:

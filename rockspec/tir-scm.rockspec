@@ -3,7 +3,7 @@ version = "0.1-1"
 
 source = {
    url = "http://mongrel2.org/static/tir-0.1.tar.gz",
-   md5 = "MD5",
+   md5 = "887e49ea6fc23133ab719e4a9572ff79",
 }
 
 description = {
