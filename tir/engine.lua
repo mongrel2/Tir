@@ -185,12 +185,13 @@ function compile_view(tmpl, name)
     local code = {'local result, children = {}, {}\n'}
 
     for text, block in string.gmatch(tmpl, "([^{]-)(%b{})") do
-        code[#code+1] =  ('result[#result+1] = [[%s]]'):format(text)
-
         local act = VIEW_ACTIONS[block:sub(1,2)]
 
         if act then
+            code[#code+1] =  'result[#result+1] = [[' .. text .. ']]'
             code[#code+1] = act(block:sub(3,-3))
+        else
+            code[#code+1] = 'result[#result+1] = [[' .. text .. block .. ']]'
         end
     end
 
