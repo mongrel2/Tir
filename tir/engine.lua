@@ -138,7 +138,7 @@ function form(required_fields)
         local has_required = self:requires(params)
 
         if has_required and self.required_fields.validator then
-            return self.required_fields.validator(form)
+            return self.required_fields.validator(params)
         else
             return has_required
         end
