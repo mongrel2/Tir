@@ -186,12 +186,15 @@ function compile_view(tmpl, name)
 
     for text, block in string.gmatch(tmpl, "([^{]-)(%b{})") do
         local act = VIEW_ACTIONS[block:sub(1,2)]
+        local output = text
 
         if act then
             code[#code+1] =  'result[#result+1] = [[' .. text .. ']]'
             code[#code+1] = act(block:sub(3,-3))
-        else
+        elseif #block > 2 then
             code[#code+1] = 'result[#result+1] = [[' .. text .. block .. ']]'
+        else
+            code[#code+1] =  'result[#result+1] = [[' .. text .. ']]'
         end
     end
 
