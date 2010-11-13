@@ -431,13 +431,12 @@ function run(conn, config)
                     good, error = exec_state(false, state, request, before, after)
                 end
 
+                if not good and error then
+                    report_error(conn, request, error, state)
+                end
 
-                -- If the main is done, stop tracking the client
-                if coroutine.status(state.controller) == "dead" then
-                    if not good then
-                        report_error(conn, request, error, state)
-                    end
-
+                -- If the main is done or we got an eror, stop tracking the client
+                if not good or coroutine.status(state.controller) == "dead" then
                     STATE[conn_id] = nil
                 end
             end
