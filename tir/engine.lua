@@ -369,7 +369,7 @@ function exec_state(first_run, state, request, before, after)
     local good, error 
 
     if before then
-        good, error = before(state, request)
+        good, error = pcall(before, state, request)
 
         if not good then
             return good, error
@@ -383,7 +383,7 @@ function exec_state(first_run, state, request, before, after)
     end
 
     if after then
-        local after_good, after_error = after(state, request)
+        local after_good, after_error = pcall(after, state, request)
 
         if not after_good then
             return after_good, after_error
