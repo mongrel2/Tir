@@ -20,6 +20,7 @@ local CONFIG_FILE="conf/config.lua"
 local TEMPLATES = "views/"
 local UUID_TYPE = 'random'
 
+
 -- Creates Web objects that the engine passes to your coroutines.
 function web(conn, main, req)
     local controller = coroutine.create(main)
@@ -33,12 +34,21 @@ function web(conn, main, req)
         return self.req.headers.PATH
     end
 
-    function Web:set_cookie(data)
-        self.req.headers['set-cookie'] = data
+    function Web:zap_session()
+        -- to zap the session we just set a new random cookie instead
+        self:set_cookie(make_session_cookie())
     end
 
-    function Web:get_cookie(data)
+    function Web:set_cookie(cookie)
+        self.req.headers['set-cookie'] = cookie
+    end
+
+    function Web:get_cookie()
         return self.req.headers['cookie']
+    end
+
+    function Web:session()
+        return parse_session_id(self:get_cookie())
     end
 
     function Web:send(data)
@@ -231,18 +241,35 @@ function view(name)
 end
 
 
--- This is the default way an engine identifies a connection, using
--- cookies.  YOu can change this to use just the connection id too.
-local function default_ident(req)
-    local cookie = req.headers['cookie']
+function make_session_id()
+    return 'APP-' .. uuid.new(UUID_TYPE)
+end
 
-    if not cookie then
-        cookie = "APP-" .. uuid.new(UUID_TYPE)
+function make_session_cookie(ident)
+    return 'session="' .. (ident or make_session_id()) .. '"; Version="1"; Path="/"'
+end
+
+function parse_session_id(cookie)
+    if not cookie then return nil end
+
+    return cookie:match('session="(APP-[a-z0-9\-]+)";?')
+end
+
+
+-- This is the default way an engine identifies a connection, using
+-- cookies.  You can change this to use just the connection id too.
+local function default_ident(req)
+    local ident = parse_session_id(req.headers['cookie'])
+
+    if not ident then
+        ident = make_session_id()
+        cookie = make_session_cookie(ident)
+
         req.headers['set-cookie'] = cookie
         req.headers['cookie'] = cookie
     end
 
-    return cookie
+    return ident
 end
 
 
@@ -289,7 +316,7 @@ function parse_form(req)
         end
     end
 
-    params.__cookie = req.headers['cookie']
+    params.__session = parse_session_id(req.headers['cookie'])
 
     return params
 end
@@ -338,10 +365,39 @@ function report_error(conn, request, error, state)
     print("ERROR", error)
 end
 
+function exec_state(first_run, state, request, before, after)
+    local good, error 
+
+    if before then
+        good, error = before(state, request)
+
+        if not good then
+            return good, error
+        end
+    end
+   
+    if first_run then
+        good, error = coroutine.resume(state.controller, state, request)
+    else
+        good, error = coroutine.resume(state.controller, request)
+    end
+
+    if after then
+        local after_good, after_error = after(state, request)
+
+        if not after_good then
+            return after_good, after_error
+        end
+    end
+
+    return good, error
+end
+
 
 -- Runs a Tir engine using the given connection and configuration.
 function run(conn, config)
     local main, ident, disconnect = config.main, config.ident, config.disconnect
+    local before, after = config.before, config.after
     local good, error
     local request, msg_type, controller
     local conn_id, state
@@ -369,10 +425,10 @@ function run(conn, config)
                 if not state then
                     state = web(conn, main, request)
                     STATE[conn_id] = state
-                    good, error = coroutine.resume(state.controller, state, request)
+                    good, error = exec_state(true, state, request, before, after)
                 else
                     state.req = request
-                    good, error = coroutine.resume(state.controller, request)
+                    good, error = exec_state(false, state, request, before, after)
                 end
 
 
