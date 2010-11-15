@@ -30,6 +30,12 @@ function web(conn, main, req)
         main=main, controller = controller
     }
 
+    if req.headers.METHOD == 'JSON' then
+        Web.session_id = req.data.session_id
+    else
+        Web.session_id = parse_session_id(req.headers['cookie'])
+    end
+
     function Web:path()
         return self.req.headers.PATH
     end
@@ -48,7 +54,7 @@ function web(conn, main, req)
     end
 
     function Web:session()
-        return parse_session_id(self:get_cookie())
+        return self.session_id
     end
 
     function Web:send(data)
@@ -67,7 +73,8 @@ function web(conn, main, req)
 
 
     function Web:recv()
-        return coroutine.yield()
+        self.req = coroutine.yield()
+        return self.req
     end
 
     function Web:click(requires)
@@ -256,9 +263,19 @@ function parse_session_id(cookie)
 end
 
 
--- This is the default way an engine identifies a connection, using
--- cookies.  You can change this to use just the connection id too.
-local function default_ident(req)
+local function json_ident(req)
+    local ident = req.data.session_id
+
+    if not ident then
+        ident = make_session_id()
+        req.data.session_id = ident
+    end
+
+    return ident
+end
+
+
+local function http_cookie_ident(req)
     local ident = parse_session_id(req.headers['cookie'])
 
     if not ident then
@@ -270,6 +287,18 @@ local function default_ident(req)
     end
 
     return ident
+end
+
+-- This is the default way an engine identifies a connection, using
+-- cookies.  You can change this to use just the connection id too.
+-- It will handle either JSON requests or HTTP requests and it will
+-- craft cookies for you.
+local function default_ident(req)
+    if req.headers.METHOD == "JSON" then
+        return json_ident(req)
+    else
+        return http_cookie_ident(req)
+    end
 end
 
 
@@ -370,10 +399,8 @@ function exec_state(first_run, state, request, before, after)
 
     if before then
         good, error = pcall(before, state, request)
-
-        if not good then
-            return good, error
-        end
+        if not good then return good, error end
+        if not error then return false end
     end
    
     if first_run then
@@ -384,10 +411,8 @@ function exec_state(first_run, state, request, before, after)
 
     if after then
         local after_good, after_error = pcall(after, state, request)
-
-        if not after_good then
-            return after_good, after_error
-        end
+        if not after_good then return after_good, after_error end
+        if not after_error then return false end
     end
 
     return good, error
@@ -408,13 +433,15 @@ function run(conn, config)
 
         if good then
             msg_type = request.data.type
-            conn_id = ident(request)
 
             if msg_type == 'disconnect' then
                 -- The client has disconnected
-                if disconnect then disconnect(req.conn_id) end
+                if disconnect then disconnect(request) end
                 print("DISCONNECT", request.conn_id)
             else
+                conn_id = ident(request)
+                print("CONN ID", conn_id)
+
                 print("REQUEST " .. config.route .. ":" .. request.conn_id, os.date(),
                           request.headers.PATH, request.headers.METHOD)
 
