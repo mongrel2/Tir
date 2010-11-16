@@ -176,21 +176,21 @@ local VIEW_ACTIONS = {
     end,
 
     ['{{'] = function(code)
-        return ('result[#result+1] = %s'):format(code)
+        return ('_result[#_result+1] = %s'):format(code)
     end,
 
     ['{('] = function(code)
         return ([[ 
-            if not children[%s] then
-                children[%s] = Tir.view(%s)
+            if not _children[%s] then
+                _children[%s] = Tir.view(%s)
             end
 
-            result[#result+1] = children[%s](getfenv())
+            _result[#_result+1] = _children[%s](getfenv())
         ]]):format(code, code, code, code)
     end,
 
     ['{<'] = function(code)
-        return ('result[#result+1] =  Tir.escape(%s)'):format(code)
+        return ('_result[#_result+1] =  Tir.escape(%s)'):format(code)
     end,
 }
 
@@ -199,23 +199,23 @@ local VIEW_ACTIONS = {
 -- returns a function you can call with a table to render the view.
 function compile_view(tmpl, name)
     local tmpl = tmpl .. '{}'
-    local code = {'local result, children = {}, {}\n'}
+    local code = {'local _result, _children = {}, {}\n'}
 
     for text, block in string.gmatch(tmpl, "([^{]-)(%b{})") do
         local act = VIEW_ACTIONS[block:sub(1,2)]
         local output = text
 
         if act then
-            code[#code+1] =  'result[#result+1] = [[' .. text .. ']]'
+            code[#code+1] =  '_result[#_result+1] = [[' .. text .. ']]'
             code[#code+1] = act(block:sub(3,-3))
         elseif #block > 2 then
-            code[#code+1] = 'result[#result+1] = [[' .. text .. block .. ']]'
+            code[#code+1] = '_result[#_result+1] = [[' .. text .. block .. ']]'
         else
-            code[#code+1] =  'result[#result+1] = [[' .. text .. ']]'
+            code[#code+1] =  '_result[#_result+1] = [[' .. text .. ']]'
         end
     end
 
-    code[#code+1] = 'return table.concat(result)'
+    code[#code+1] = 'return table.concat(_result)'
 
     code = table.concat(code, '\n')
     local func, err = loadstring(code, name)
@@ -304,6 +304,8 @@ end
 
 -- Simplistic HTML escaping.
 function escape(s)
+    if s == nil then return '' end
+
     local esc, i = s:gsub('&', '&amp;'):gsub('<', '&lt;'):gsub('>', '&gt;')
     return esc
 end
@@ -440,7 +442,6 @@ function run(conn, config)
                 print("DISCONNECT", request.conn_id)
             else
                 conn_id = ident(request)
-                print("CONN ID", conn_id)
 
                 print("REQUEST " .. config.route .. ":" .. request.conn_id, os.date(),
                           request.headers.PATH, request.headers.METHOD)
