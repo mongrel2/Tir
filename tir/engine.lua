@@ -22,12 +22,19 @@ local UUID_TYPE = 'random'
 
 
 -- Creates Web objects that the engine passes to your coroutines.
-function web(conn, main, req)
-    local controller = coroutine.create(main)
+function web(conn, main, req, stateless)
+    local controller
+
+    if stateless then
+        controller = main
+    else
+        controller = coroutine.create(main)
+    end
 
     local Web = { 
         conn = conn, req = req,
-        main=main, controller = controller
+        main=main, controller = controller,
+        stateless = stateless
     }
 
     if req.headers.METHOD == 'JSON' then
@@ -61,50 +68,6 @@ function web(conn, main, req)
         return self.conn:reply_json(self.req, data)
     end
 
-    function Web:page(data, code, status, headers)
-        headers = headers or {}
-
-        if self.req.headers['set-cookie'] then
-            headers['set-cookie'] = self.req.headers['set-cookie']
-        end
-
-        return self.conn:reply_http(self.req, data, code, status, headers)
-    end
-
-
-    function Web:recv()
-        self.req = coroutine.yield()
-        return self.req
-    end
-
-    function Web:click(requires)
-        local req = self:recv()
-        return req.headers.PATH
-    end
-
-    function Web:expect(pattern, data, code, status, headers)
-        self:page(data, code, status, headers)
-        local path = self:click()
-
-        if string.match(path, pattern) then
-            return path, nil
-        else
-            self:error("Not found", 404, "Not Found")
-            return nil, "Not Found"
-        end
-    end
-
-
-    function Web:prompt(data, code, status, headers)
-        self:page(data, code, status, headers)
-        return self:input()
-    end
-
-    function Web:input()
-        local req = self:recv()
-        return parse_form(req)
-    end
-
     function Web:close()
         self.conn:close(self.req)
     end
@@ -116,6 +79,57 @@ function web(conn, main, req)
     function Web:error(data, code, status, headers)
         self:page(data, code, status, headers)
         self:close()
+    end
+
+    function Web:page(data, code, status, headers)
+        headers = headers or {}
+
+        if self.req.headers['set-cookie'] then
+            headers['set-cookie'] = self.req.headers['set-cookie']
+        end
+
+        return self.conn:reply_http(self.req, data, code, status, headers)
+    end
+
+    if stateless then
+        function Web:recv() error("This is a stateless handler, can't call recv.") end
+        function Web:click() error("This is a stateless handler, can't call click.") end
+        function Web:expect() error("This is a stateless handler, can't call expect.") end
+        function Web:prompt() error("This is a stateless handler, can't call prompt.") end
+        function Web:input() error("This is a stateless handler, can't call input.") end
+    else
+        function Web:recv()
+            self.req = coroutine.yield()
+            return self.req
+        end
+
+        function Web:click(requires)
+            local req = self:recv()
+            return req.headers.PATH
+        end
+
+        function Web:expect(pattern, data, code, status, headers)
+            self:page(data, code, status, headers)
+            local path = self:click()
+
+            if string.match(path, pattern) then
+                return path, nil
+            else
+                self:error("Not found", 404, "Not Found")
+                return nil, "Not Found"
+            end
+        end
+
+
+        function Web:prompt(data, code, status, headers)
+            self:page(data, code, status, headers)
+            return self:input()
+        end
+
+        function Web:input()
+            local req = self:recv()
+            return parse_form(req)
+        end
     end
 
     return Web
@@ -354,14 +368,14 @@ end
 
 
 -- Used for dumping json so it can be displayed to someone.
-function pretty_json(tab)
+local function pretty_json(tab)
     return json.encode(tab):gsub('","', '",\n"')
 end
 
 
 -- Loads a source file, but converts it with line numbering only showing
 -- from firstline to lastline.
-function load_lines(source, firstline, lastline)
+local function load_lines(source, firstline, lastline)
     local f = io.open(source)
     local lines = {}
     local i = 0
@@ -378,12 +392,19 @@ function load_lines(source, firstline, lastline)
     return table.concat(lines,'\n')
 end
 
+
 -- Reports errors back to the browser so the user has something to work with.
-function report_error(conn, request, error, state)
+local function report_error(conn, request, error, state)
     local pretty_req = pretty_json(request)
     local trace = debug.traceback(state.controller, error)
-    local info = debug.getinfo(state.controller, state.main)
+    local info
     local source = nil
+
+    if state.stateless then
+        info = debug.getinfo(state.main)
+    else
+        info = debug.getinfo(state.controller, state.main)
+    end
 
     if info.source:match("@.+$") then
         source = load_lines(info.short_src, info.linedefined, info.lastlinedefined)
@@ -396,7 +417,8 @@ function report_error(conn, request, error, state)
     print("ERROR", error)
 end
 
-function exec_state(first_run, state, request, before, after)
+
+local function exec_state(first_run, state, request, before, after)
     local good, error 
 
     if before then
@@ -421,13 +443,52 @@ function exec_state(first_run, state, request, before, after)
 end
 
 
+local function run_coro(main, conn, request, conn_id, before, after)
+    -- The client has sent data
+    local state = STATE[conn_id]
+    local good, error
+
+    -- If the client hasn't sent data before, create a new main.
+    if not state then
+        state = web(conn, main, request, false)
+        STATE[conn_id] = state
+        good, error = exec_state(true, state, request, before, after)
+    else
+        state.req = request
+        good, error = exec_state(false, state, request, before, after)
+    end
+
+    if not good and error then
+        report_error(conn, request, error, state)
+    end
+
+    -- If the main is done or we got an eror, stop tracking the client
+    if not good or coroutine.status(state.controller) == "dead" then
+        STATE[conn_id] = nil
+    end
+
+    return good, error
+end
+
+
+local function run_stateless(conn, main, request)
+    local state = web(conn, main, request, true)
+    local good, error = pcall(main, state, request)
+
+    if not good and error then
+        report_error(conn, request, error, state)
+    end
+end
+
 -- Runs a Tir engine using the given connection and configuration.
 function run(conn, config)
     local main, ident, disconnect = config.main, config.ident, config.disconnect
     local before, after = config.before, config.after
     local good, error
     local request, msg_type, controller
-    local conn_id, state
+    local conn_id
+    local stateless = config.stateless or false
+    local state
 
     while true do
         -- Get a message from the Mongrel2 server
@@ -441,31 +502,15 @@ function run(conn, config)
                 if disconnect then disconnect(request) end
                 print("DISCONNECT", request.conn_id)
             else
+                print("REQUEST " .. config.route .. ":" .. request.conn_id, os.date(), request.headers.PATH, request.headers.METHOD)
+
+                -- always do this
                 conn_id = ident(request)
 
-                print("REQUEST " .. config.route .. ":" .. request.conn_id, os.date(),
-                          request.headers.PATH, request.headers.METHOD)
-
-                -- The client has sent data
-                state = STATE[conn_id]
-
-                -- If the client hasn't sent data before, create a new main.
-                if not state then
-                    state = web(conn, main, request)
-                    STATE[conn_id] = state
-                    good, error = exec_state(true, state, request, before, after)
+                if stateless then
+                    run_stateless(conn, main, request)
                 else
-                    state.req = request
-                    good, error = exec_state(false, state, request, before, after)
-                end
-
-                if not good and error then
-                    report_error(conn, request, error, state)
-                end
-
-                -- If the main is done or we got an eror, stop tracking the client
-                if not good or coroutine.status(state.controller) == "dead" then
-                    STATE[conn_id] = nil
+                    run_coro(main, conn, request, conn_id, before, after)
                 end
             end
         else
@@ -516,6 +561,7 @@ function start(config)
     -- Run the engine
     run(conn, config)
 end
+
 
 
 -- Helper function that does a debug dump of the given data.
