@@ -135,6 +135,8 @@ function web(conn, main, req, stateless)
     return Web
 end
 
+
+
 -- Creates Form objects for validating form input in the coroutines.
 function form(required_fields)
     local Form = {
@@ -183,6 +185,7 @@ function form(required_fields)
 end
 
 
+
 -- Used in template parsing to figure out what each {} does.
 local VIEW_ACTIONS = {
     ['{%'] = function(code)
@@ -207,6 +210,7 @@ local VIEW_ACTIONS = {
         return ('_result[#_result+1] =  Tir.escape(%s)'):format(code)
     end,
 }
+
 
 
 -- Takes a view template and optional name (usually a file) and 
@@ -260,6 +264,7 @@ function view(name)
         end
     end
 end
+
 
 
 function make_session_id()
@@ -344,6 +349,7 @@ function url_parse(data)
 end
 
 
+
 -- Parses a form out of the request, figuring out if it's something that
 -- we can handle.  It might not handle all the really weird ways forms are
 -- encoded, so YYMV.
@@ -418,7 +424,7 @@ local function report_error(conn, request, err, state)
 end
 
 
-local function exec_state(first_run, state, request, before, after)
+local function exec_state(state, request, before, after, action_func)
     local good, err 
 
     if before then
@@ -426,13 +432,9 @@ local function exec_state(first_run, state, request, before, after)
         if not good then return good, err end
         if not err then return false end
     end
-   
-    if first_run then
-        good, err = coroutine.resume(state.controller, state, request)
-    else
-        good, err = coroutine.resume(state.controller, request)
-    end
 
+    good, err = action_func(state, request)
+   
     if after then
         local after_good, after_err = pcall(after, state, request)
         if not after_good then return after_good, after_err end
@@ -452,10 +454,17 @@ local function run_coro(main, conn, request, conn_id, before, after)
     if not state then
         state = web(conn, main, request, false)
         STATE[conn_id] = state
-        good, err = exec_state(true, state, request, before, after)
+        good, err = exec_state(state, request, before, after,
+            function (s, r)
+                return coroutine.resume(state.controller, state, request) 
+            end)
     else
         state.req = request
-        good, err = exec_state(false, state, request, before, after)
+
+        good, err = exec_state(state, request, before, after,
+            function (s, r)
+                return coroutine.resume(s.controller, r) 
+            end)
     end
 
     if not good and err then
@@ -469,12 +478,15 @@ local function run_coro(main, conn, request, conn_id, before, after)
 end
 
 
-local function run_stateless(conn, main, request)
+local function run_stateless(conn, main, request, before, after)
     local state = web(conn, main, request, true)
-    local good, err = pcall(main, state, request)
+
+    local good, err = exec_state(state, request, before, after, function(s,r)
+        return pcall(s.controller, s, r)
+    end)
 
     if not good and err then
-        report_err(conn, request, err, state)
+        report_error(conn, request, err, state)
     end
 end
 
@@ -506,7 +518,7 @@ function run(conn, config)
                 conn_id = ident(request)
 
                 if stateless then
-                    run_stateless(conn, main, request)
+                    run_stateless(conn, main, request, before, after)
                 else
                     run_coro(main, conn, request, conn_id, before, after)
                 end
@@ -558,6 +570,14 @@ function start(config)
 
     -- Run the engine
     run(conn, config)
+end
+
+
+-- returns a function that can be used as an after/before filter router.
+-- It takes a [[route]] == function table and checks them against the
+-- path, and if a match is found runs it instead of the main loop.
+function actions(routes)
+    
 end
 
 
