@@ -394,9 +394,9 @@ end
 
 
 -- Reports errors back to the browser so the user has something to work with.
-local function report_error(conn, request, error, state)
+local function report_error(conn, request, err, state)
     local pretty_req = pretty_json(request)
-    local trace = debug.traceback(state.controller, error)
+    local trace = debug.traceback(state.controller, err)
     local info
     local source = nil
 
@@ -412,83 +412,81 @@ local function report_error(conn, request, error, state)
         source = info.source
     end
 
-    local page = ERROR_PAGE {error=trace, source=source, request=pretty_req}
+    local page = ERROR_PAGE {err=trace, source=source, request=pretty_req}
     conn:reply_http(request, page, 500, "Internal Server Error")
-    print("ERROR", error)
+    print("ERROR", err)
 end
 
 
 local function exec_state(first_run, state, request, before, after)
-    local good, error 
+    local good, err 
 
     if before then
-        good, error = pcall(before, state, request)
-        if not good then return good, error end
-        if not error then return false end
+        good, err = pcall(before, state, request)
+        if not good then return good, err end
+        if not err then return false end
     end
    
     if first_run then
-        good, error = coroutine.resume(state.controller, state, request)
+        good, err = coroutine.resume(state.controller, state, request)
     else
-        good, error = coroutine.resume(state.controller, request)
+        good, err = coroutine.resume(state.controller, request)
     end
 
     if after then
-        local after_good, after_error = pcall(after, state, request)
-        if not after_good then return after_good, after_error end
-        if not after_error then return false end
+        local after_good, after_err = pcall(after, state, request)
+        if not after_good then return after_good, after_err end
+        if not after_err then return false end
     end
 
-    return good, error
+    return good, err
 end
 
 
 local function run_coro(main, conn, request, conn_id, before, after)
     -- The client has sent data
     local state = STATE[conn_id]
-    local good, error
+    local good, err
 
     -- If the client hasn't sent data before, create a new main.
     if not state then
         state = web(conn, main, request, false)
         STATE[conn_id] = state
-        good, error = exec_state(true, state, request, before, after)
+        good, err = exec_state(true, state, request, before, after)
     else
         state.req = request
-        good, error = exec_state(false, state, request, before, after)
+        good, err = exec_state(false, state, request, before, after)
     end
 
-    if not good and error then
-        report_error(conn, request, error, state)
+    if not good and err then
+        report_error(conn, request, err, state)
     end
 
     -- If the main is done or we got an eror, stop tracking the client
     if not good or coroutine.status(state.controller) == "dead" then
         STATE[conn_id] = nil
     end
-
-    return good, error
 end
 
 
 local function run_stateless(conn, main, request)
     local state = web(conn, main, request, true)
-    local good, error = pcall(main, state, request)
+    local good, err = pcall(main, state, request)
 
-    if not good and error then
-        report_error(conn, request, error, state)
+    if not good and err then
+        report_err(conn, request, err, state)
     end
 end
+
 
 -- Runs a Tir engine using the given connection and configuration.
 function run(conn, config)
     local main, ident, disconnect = config.main, config.ident, config.disconnect
     local before, after = config.before, config.after
-    local good, error
+    local good, err
     local request, msg_type, controller
     local conn_id
     local stateless = config.stateless or false
-    local state
 
     while true do
         -- Get a message from the Mongrel2 server
@@ -504,7 +502,7 @@ function run(conn, config)
             else
                 print("REQUEST " .. config.route .. ":" .. request.conn_id, os.date(), request.headers.PATH, request.headers.METHOD)
 
-                -- always do this
+                -- always do this so the request is setup also
                 conn_id = ident(request)
 
                 if stateless then
@@ -586,7 +584,7 @@ ERROR_PAGE = compile_view [[
 <p>There was an error processing your request.</p>
 <h1>Stack Trace</h1>
 <pre>
-{{ error }}
+{{ err }}
 </pre>
 <h1>Source Code</h1>
 <pre>
