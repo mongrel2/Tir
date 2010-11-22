@@ -271,8 +271,15 @@ function make_session_id()
     return 'APP-' .. uuid.new(UUID_TYPE)
 end
 
+function make_expires()
+    temp = os.date("*t", os.time())
+    temp.year = temp.year + 20
+    return os.date("%a, %d-%b-%Y %X GMT", os.time(temp))
+end
+
 function make_session_cookie(ident)
-    return 'session="' .. (ident or make_session_id()) .. '"; Version="1"; Path="/"'
+    return 'session="' .. (ident or make_session_id()) ..
+            '"; version=1; path=/; expires=' .. make_expires()
 end
 
 function parse_session_id(cookie)
