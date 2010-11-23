@@ -47,6 +47,10 @@ function web(conn, main, req, stateless)
         return self.req.headers.PATH
     end
 
+    function Web:method()
+        return self.req.headers.METHOD
+    end
+
     function Web:zap_session()
         -- to zap the session we just set a new random cookie instead
         self:set_cookie(make_session_cookie())
@@ -369,8 +373,12 @@ function parse_form(req)
             params = url_parse(headers.QUERY)
         end
     elseif headers.METHOD == 'POST' then
-        if headers['content-type'] == 'application/x-www-form-urlencoded' then
+        local ctype = headers['content-type'] or ""
+
+        if ctype:match('^.*application/x%-www%-form%-urlencoded.*$') then
             params = url_parse(req.body)
+        else
+            error("POST RECEIVED BUT NO CONTENT TYPE WE UNDERSTAND:", ctype)
         end
     end
 
