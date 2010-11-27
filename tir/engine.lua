@@ -80,10 +80,17 @@ function web(conn, main, req, stateless)
         self:page("", 303, "See Other", {Location=url})
     end
 
+    -- reports an error then closes the connection
     function Web:error(data, code, status, headers)
         self:page(data, code, status, headers)
         self:close()
     end
+
+    -- a bunch of common errors and responses
+    function Web:not_found(msg) self:error(msg or 'Not Found', 404, 'Not Found') end
+    function Web:unauthorized(msg) self:error(msg or 'Unauthorized', 401, 'Unauthorized') end
+    function Web:forbidden(msg) self:error(msg or 'Forbidden', 403, 'Forbidden') end
+    function Web:bad_request(msg) self:error(msg or 'Bad Request', 400, 'Bad Request') end
 
     function Web:page(data, code, status, headers)
         headers = headers or {}
@@ -94,6 +101,9 @@ function web(conn, main, req, stateless)
 
         return self.conn:reply_http(self.req, data, code, status, headers)
     end
+
+    -- shortcut for a common Xhr response
+    function Web:ok(msg) self:page(msg or 'OK', 200, 'OK') end
 
     if stateless then
         function Web:recv() error("This is a stateless handler, can't call recv.") end
@@ -349,17 +359,58 @@ end
 
 -- Basic URL parsing that handles simple key=value&key=value setups
 -- and decodes both key and value.
-function url_parse(data)
+function url_parse(data, sep)
     local result = {}
-    data = data .. '&'
-    for k,v in data:gmatch("(.-)=(.-)&") do
-        result[url_decode(k)] = url_decode(v)
+    sep = sep or '&'
+    data = data .. sep
+
+    for piece in data:gmatch("(.-)" .. sep) do
+        local k,v = piece:match("(.-)=(.*)")
+
+        if k then
+            result[url_decode(k)] = url_decode(v)
+        else
+            result[#result + 1] = url_decode(piece)
+        end
+    end
+
+    return result
+end
+
+local ENCODING_MATCH = '^%s-([%w/%-]+);*(.*)$'
+local URL_ENCODED_FORM = 'application/x-www-form-urlencoded'
+local MULTIPART_ENCODED_FORM = 'multipart/form-data'
+
+function parse_headers(head)
+    local result = {}
+    head = head .. '\r\n'
+
+    for key, val in head:gmatch('%s*(.-):%s*(.-)\r\n') do
+        print("KEY", key, "VAL", val)
+        result[key:lower()] = url_parse(val, ';')
     end
 
     return result
 end
 
 
+function extract_multipart(body, params)
+    -- very simplistic and will require the whole file be loaded into ram
+    params = params .. ';'
+    local boundary = '%-%-' .. params:match('^.*boundary=(.-);.*$'):gsub('%-', '%%-')
+    local results = {}
+
+    -- go through each part, and break out the headers from the 
+    for part in body:gmatch('(.-)' .. boundary) do
+        local head, piece = part:match('^(.-)\r\n\r\n(.*)\r\n$')
+
+        if head then
+            results[#results + 1] = parse_headers(head)
+        end
+    end
+
+    return results
+end
 
 -- Parses a form out of the request, figuring out if it's something that
 -- we can handle.  It might not handle all the really weird ways forms are
@@ -374,11 +425,16 @@ function parse_form(req)
         end
     elseif headers.METHOD == 'POST' then
         local ctype = headers['content-type'] or ""
+        local encoding, params = ctype:match(ENCODING_MATCH)
+        encoding = encoding:lower()
 
-        if ctype:match('^.*application/x%-www%-form%-urlencoded.*$') then
+        if encoding == URL_ENCODED_FORM then
             params = url_parse(req.body)
+        elseif encoding == MULTIPART_ENCODED_FORM then
+            req.parts = extract_multipart(req.body, params)
+            req.multipart = true
         else
-            error("POST RECEIVED BUT NO CONTENT TYPE WE UNDERSTAND:", ctype)
+            error("POST RECEIVED BUT NO CONTENT TYPE WE UNDERSTAND: " .. ctype)
         end
     end
 
@@ -588,13 +644,6 @@ function start(config)
 end
 
 
--- returns a function that can be used as an after/before filter router.
--- It takes a [[route]] == function table and checks them against the
--- path, and if a match is found runs it instead of the main loop.
-function actions(routes)
-    
-end
-
 
 
 -- Helper function that does a debug dump of the given data.
@@ -609,6 +658,26 @@ function load_file(from_dir, name)
     intmp:close()
 
     return content
+end
+
+function update(target, source, keys)
+    if keys then 
+        for _, key in ipairs(keys) do
+            target[key] = source[key]
+        end
+    else
+        for k,v in pairs(keys) do
+            target[key] = source[key]
+        end
+    end
+end
+
+
+-- useful for tables and params and stuff
+function clone(source, keys)
+    local target = {}
+    update(target, source, keys)
+    return target
 end
 
 
