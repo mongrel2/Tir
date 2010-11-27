@@ -365,7 +365,7 @@ function url_parse(data, sep)
     data = data .. sep
 
     for piece in data:gmatch("(.-)" .. sep) do
-        local k,v = piece:match("(.-)=(.*)")
+        local k,v = piece:match("%s*(.-)%s*=(.*)")
 
         if k then
             result[url_decode(k)] = url_decode(v)
@@ -386,7 +386,6 @@ function parse_headers(head)
     head = head .. '\r\n'
 
     for key, val in head:gmatch('%s*(.-):%s*(.-)\r\n') do
-        print("KEY", key, "VAL", val)
         result[key:lower()] = url_parse(val, ';')
     end
 
@@ -405,7 +404,16 @@ function extract_multipart(body, params)
         local head, piece = part:match('^(.-)\r\n\r\n(.*)\r\n$')
 
         if head then
-            results[#results + 1] = parse_headers(head)
+            head = parse_headers(head)
+
+            local cdisp = head['content-disposition']
+
+            if cdisp and cdisp.name and cdisp[1] == 'form-data' and not head['content-type'] then
+                results[cdisp.name:match('"(.-)"')] = piece
+            else
+                head.body = piece
+                results[#results + 1] = head
+            end
         end
     end
 
@@ -425,14 +433,14 @@ function parse_form(req)
         end
     elseif headers.METHOD == 'POST' then
         local ctype = headers['content-type'] or ""
-        local encoding, params = ctype:match(ENCODING_MATCH)
+        local encoding, encparams = ctype:match(ENCODING_MATCH)
         encoding = encoding:lower()
 
         if encoding == URL_ENCODED_FORM then
             params = url_parse(req.body)
         elseif encoding == MULTIPART_ENCODED_FORM then
-            req.parts = extract_multipart(req.body, params)
-            req.multipart = true
+            params = extract_multipart(req.body, encparams)
+            params.multipart = true
         else
             error("POST RECEIVED BUT NO CONTENT TYPE WE UNDERSTAND: " .. ctype)
         end
