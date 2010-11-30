@@ -103,7 +103,11 @@ COMMANDS = {
         while true do
             local targets = assert(posix.glob(app))
 
-            COMMANDS.test(settings)
+
+            if not os.getenv('PROD') then
+                print "Running in PROD mode, won't run tests."
+                COMMANDS.test(settings)
+            end
 
             PIDS = run_app(targets)
             wait_on_children(PIDS)
