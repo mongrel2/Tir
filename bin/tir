@@ -103,10 +103,10 @@ COMMANDS = {
         while true do
             local targets = assert(posix.glob(app))
 
-
             if not os.getenv('PROD') then
-                print "Running in PROD mode, won't run tests."
                 COMMANDS.test(settings)
+            else
+                print "Running in PROD mode, won't run tests."
             end
 
             PIDS = run_app(targets)
