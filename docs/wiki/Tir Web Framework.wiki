@@ -1,0 +1,175 @@
+Tir is an experimental web framework for the <a
+href="http://mongrel2.org/">Mongrel2 webserver</a> and <a
+href="http://www.lua.org/">Lua programming language</a>.  The purpose of Tir is
+to play with the idea of a <b>State Agnostic</b> web framework.  Tir lets you
+create handlers that work in various configurations as needed by your
+application requirements.
+
+Tir's philosophy is that the framework creator shouldn't be shoving
+stateful/stateless dogman in your face, and that it's possible to support
+various state management styles.
+
+With Tir you can do:
+
+<h1>Natural Style</h1>
+
+I'm calling the coroutine based handlers "Natural Style" because you write the
+code for them in a more natural way, as if you don't need to worry about routing
+and state management.  You can code up entire complex processes and interactions
+using the natural style very easily.
+
+By default, handlers are natural style and maintain a coroutine for each user
+and let you write your code using phrases like "prompt", "recv", "page", and "send".
+
+<verbatim>
+local login_page = Tir.view("login.html")
+local login_form = Tir.form { 'login_name', 'password'}
+
+local function login(web, req)
+    local params = login_form:parse(req)
+
+    repeat
+        params = web:prompt(login_page {form=params, logged_in=false})
+    until login_form:valid(params)
+    
+    return web:redirect('/')
+end
+
+Tir.start {route='/Login', main=login}
+</verbatim>
+
+
+<h1>Stateless Style</h1>
+
+Handlers can be made "stateless" and they'll work like coroutine handlers, but
+not retain any state.  These are good for one-shot operations and simpler
+actions that don't need much routing.
+
+<verbatim>
+local search_page = Tir.view("search.html")
+local search_form = Tir.form {"q"}
+
+local function search(web, req)
+    local params = search_form:parse(req)
+    local q = params.q
+    local results = {}
+
+    if search_form:valid(params) then 
+        local pattern = ".*" .. q:upper() .. ".*";
+
+        for i, cat in ipairs(categories) do
+            if cat:upper():match(pattern) then
+                results[#results + 1] = cat
+            end
+        end
+    end
+
+    web:page(search_page {results=results, q=q})
+end
+
+Tir.stateless {route='/Search', main=search}
+</verbatim>
+
+<h1>Evented Styles</h1>
+
+Tir also supports the alternative "evented" style, which means that URLs are
+mapped to callback functions in your handler.  A simple URL pattern is used to
+transform your /Route/action style URLs into a function to call.  Best of all,
+evented operation can be combined with stateless (the default) or
+coroutines, so you can easily refactor complex URL schemes if you
+need:
+
+<verbatim>
+local Manage = {
+    form = Tir.form {"id", "action"}
+}
+
+function Manage.people(web, req, params)
+    -- Do whatever managing people does.
+end
+
+function Manage.cats(web, req, params)
+    -- Whatever managing cats means, if that's possible.
+end
+
+function Manage.dogs(web, req, params)
+    -- Ah way easier to manage dogs.
+end
+
+Manage.config = {
+    route='/Manage', 
+}
+
+Tir.evented(Manage)
+</verbatim>
+
+In this style, Manage.form is run and then your handlers receive the results to
+work with right away.  You can even change the routing pattern if you don't
+like what I've chosen, or need even more complexity in your life.
+
+<h1>Combined Style</h1>
+
+Evented isn't restricted to stateless only.  You can combine it with a stateless
+operation and have callbacks control the state of the coroutine.  I find this a
+little confusing though since it breaks the "natural" feel of the code, but if
+you've got a reason to do it, it's possible although a little weird.
+
+
+<h1>Multiple Little Processes</h1>
+
+Tir also uses <a href="http://zeromq.org">ZeroMQ</a> and <a
+href="http://mongrel2.org">Mongrel2</a> to run the application as a set of
+small processes for each major routing, rather than one monolithic process.  In
+the above two examples, each <b>Tir.start</b> line is a single process.
+
+You can also build on this to flex and warp the size of your processes as you
+need, and locate them or cluster them however you like.  By default it shoots
+for small little processes, but nothing prevents you from doing others.
+
+<h1>Simple Templating Language</h1>
+
+Tir uses embedded Lua as it's templating language, which means you get a real
+language and not some crippled one someone smarter than you think you
+<b>should</b> be using.  And Lua already looks like most of the nice template
+languages out there:
+
+<verbatim>
+{% if #results > 0 then %}
+<ul>
+    {% for _,result in ipairs(results) do %}
+    <li>{{ result }}</li>
+    {% end %}
+</ul>
+{% else %}
+<p>We'll add "{{ q }}" as a new one.</p>
+{% end %}
+</verbatim>
+
+<h1>Async Ready</h1>
+
+Because Tir uses Mongrel2 it already support async operation, streaming,
+regular HTTP, HTTP long poll, and flash/jssockets.
+
+<h1>No ORM</h1>
+
+Tir comes without an ORM by default.  People would probably hate any ORM I
+wrote and there's plenty of options you can add.
+
+<h1>No Core</h1>
+
+This isn't really a Tir feature, but do you hate when there's bugs in your core
+libraries and that guy who "owns" the broken library refuses to fix it?  Me
+too, that's why <a href="http://lua.org">Lua</a> and <a
+href="http://luarocks.org/">LuaRocks</a> are awesome.  You get a tight core
+language that's completely described <a
+href="http://www.lua.org/manual/5.1/">in a few HTML pages</a> and then install
+all the platform libraries you need with LuaRocks.
+
+No more gatekeepers with Lua.
+
+<h1>Status</h1>
+
+Tir is very alpha, but it is being used on a few projects.  Feel free to grab
+the code and if you want to help, then contact zedshaw@zedshaw.com for more
+information.
+
