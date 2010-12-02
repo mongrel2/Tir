@@ -652,6 +652,41 @@ function start(config)
 end
 
 
+-- Convenient way to start a stateless style handler, pretty much
+-- just sets the config.stateless = true variable for you.
+function stateless(config)
+    config.stateless = true
+    Tir.start(config)
+end
+
+
+-- Starts an evented style handler, which really just makes a little
+-- wrapper closure that does a simple pattern match on your handler
+-- and then calls the function that matches it route.
+function evented(handler, pattern)
+    assert(not handler.config.main, "main is a reserved function name for evented.")
+    
+    local config = handler.config
+    handler.config = nil
+    local pattern = pattern or config.route .. '/' .. '([%w_%-]+)/?(.*)'
+
+    if config.stateless == nil then config.stateless = true end
+
+    config.main = function (web, req)
+        local action, extra = web:path():match(pattern)
+
+        if action and handler[action] then
+            local params = handler.form:parse(req)
+
+            handler[action](web, req, params)
+        else
+            print(("Action %s not found for handler %s."):format(action, route))
+            web:not_found()
+        end
+    end
+
+    Tir.start(config)
+end
 
 
 -- Helper function that does a debug dump of the given data.
