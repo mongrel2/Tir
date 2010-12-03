@@ -6,7 +6,7 @@ create handlers that work in various configurations as needed by your
 application requirements.
 
 Tir's philosophy is that the framework creator shouldn't be shoving
-stateful/stateless dogman in your face, and that it's possible to support
+stateful/stateless dogma in your face, and that it's possible to support
 various state management styles.
 
 With Tir you can do:

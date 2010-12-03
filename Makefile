@@ -1,6 +1,8 @@
-VERSION=0.4
+VERSION=0.5
 REVISION=1
-
+SPEC_FILE=tir-${VERSION}-${REVISION}.rockspec
+TAR_FILE=tir-${VERSION}-${REVISION}.tar.gz
+SRC_ROCK=tir-${VERSION}-${REVISION}.src.rock
 
 install:
 	luarocks install lua_signal
@@ -10,18 +12,19 @@ install:
 	luarocks install mongrel2-lua-scm-0.rockspec
 	luarocks install http://mongrel2.org/static/tir-${VERSION}-${REVISION}.rockspec
 
-dist_build:
+build:
 	rm -rf tmp
 	mkdir tmp
 	fossil zip trunk tmp/tir-${VERSION}.zip --name tir-${VERSION}
-	cd tmp && unzip tir-${VERSION}.zip && tar -czvf tir-${VERSION}.tar.gz tir-${VERSION}
-	cp rockspec/tir-scm.rockspec tmp/tir-${VERSION}-${REVISION}.rockspec
-	md5sum tmp/tir-${VERSION}.tar.gz 
+	cd tmp && unzip tir-${VERSION}.zip && tar -czvf ${TAR_FILE} tir-${VERSION}
+	lua tools/specgen.lua ${VERSION}-${REVISION} tmp/${SPEC_FILE} tmp/${TAR_FILE}
+	lua tools/specgen.lua scm rockspec/tir-scm.rockspec
 
-dist:
-	rsync -azv tmp/tir-${VERSION}.tar.gz tmp/tir-${VERSION}-${REVISION}.rockspec ${USER}@mongrel2.org:deployment/files/static
-
+dist: build
+	rsync -azv tmp/${TAR_FILE} tmp/${SPEC_FILE} ${USER}@mongrel2.org:deployment/files/tir/downloads/
 	cd tmp && luarocks pack tir-${VERSION}-${REVISION}.rockspec
-	rsync -azv tmp/tir-${VERSION}-${REVISION}.src.rock ${USER}@mongrel2.org:deployment/files/static/
+	rsync -azv tmp/${SRC_ROCK} ${USER}@mongrel2.org:deployment/files/tir/downloads/
 
+clean:
+	rm -rf tmp
 

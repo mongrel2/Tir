@@ -1,8 +1,12 @@
 package = "tir"
-version = "scm"
+version = "{{ VERSION }}"
 
 source = { }
-source.url = "http://tir.mongrel2.org/downloads/tir-scm.tar.gz"
+
+source.url = "http://tir.mongrel2.org/downloads/tir-{{ VERSION }}.tar.gz"
+{% if #MD5 > 0 then %}
+source.md5 = "{{ MD5 }}"
+{% end %}
 
 description = {
    summary = "Tir Mongrel2/Lua Web Framework",
@@ -11,6 +15,7 @@ description = {
    license = "BSD",
    maintainer = "zedshaw@zedshaw.com",
 }
+
 dependencies = {
    "lua >= 5.1",
     "md5",
@@ -20,6 +25,7 @@ dependencies = {
     "luaposix",
     "telescope",
 }
+
 build = {
     type = "none",
     install = {
@@ -33,3 +39,4 @@ build = {
         }
     }
 }
+
