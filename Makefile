@@ -10,13 +10,13 @@ install:
 	luarocks install lua-zmq-scm-0.rockspec
 	curl -O https://github.com/jsimmons/mongrel2-lua/raw/master/rockspecs/mongrel2-lua-scm-0.rockspec
 	luarocks install mongrel2-lua-scm-0.rockspec
-	luarocks install http://mongrel2.org/static/tir-${VERSION}-${REVISION}.rockspec
+	luarocks install http://tir.mongrel2.org/downloads/tir-${VERSION}-${REVISION}.rockspec
 
 build:
 	rm -rf tmp
 	mkdir tmp
 	fossil zip trunk tmp/tir-${VERSION}.zip --name tir-${VERSION}
-	cd tmp && unzip tir-${VERSION}.zip && tar -czvf ${TAR_FILE} tir-${VERSION}
+	cd tmp && unzip tir-${VERSION}.zip && mv tir-${VERSION} tir-${VERSION}-${REVISION} && tar -czvf ${TAR_FILE} tir-${VERSION}-${REVISION}
 	lua tools/specgen.lua ${VERSION}-${REVISION} tmp/${SPEC_FILE} tmp/${TAR_FILE}
 	lua tools/specgen.lua scm rockspec/tir-scm.rockspec
 

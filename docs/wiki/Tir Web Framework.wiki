@@ -5,18 +5,28 @@ to play with the idea of a <b>State Agnostic</b> web framework.  Tir lets you
 create handlers that work in various configurations as needed by your
 application requirements.
 
+
+<h1>Tir's Philosophy</h1>
+
 Tir's philosophy is that the framework creator shouldn't be shoving
 stateful/stateless dogma in your face, and that it's possible to support
-various state management styles.
+various state management styles.  Tir allows you to use different state management 
+strategies for different interfaces you need to design.
 
-With Tir you can do:
+  *  If a part of your application is a complex process, then <b>Natural Style</b> is the way to go.   
+  *  If there's a single URL service then <b>Stateless Style</b> is the easiest.
+  *  If you have a URL+action for say a REST API then <b>Evented Style</b> works great.
+
+The point though is that different problems are best solved with different state
+management.
 
 <h1>Natural Style</h1>
 
 I'm calling the coroutine based handlers "Natural Style" because you write the
 code for them in a more natural way, as if you don't need to worry about routing
 and state management.  You can code up entire complex processes and interactions
-using the natural style very easily.
+using the natural style very easily.  For example, pagination is difficult in
+stateless servers, but it's just a <b>repeat/until</b> loop in natural style.
 
 By default, handlers are natural style and maintain a coroutine for each user
 and let you write your code using phrases like "prompt", "recv", "page", and "send".
@@ -107,25 +117,6 @@ In this style, Manage.form is run and then your handlers receive the results to
 work with right away.  You can even change the routing pattern if you don't
 like what I've chosen, or need even more complexity in your life.
 
-<h1>Combined Style</h1>
-
-Evented isn't restricted to stateless only.  You can combine it with a stateless
-operation and have callbacks control the state of the coroutine.  I find this a
-little confusing though since it breaks the "natural" feel of the code, but if
-you've got a reason to do it, it's possible although a little weird.
-
-
-<h1>Multiple Little Processes</h1>
-
-Tir also uses <a href="http://zeromq.org">ZeroMQ</a> and <a
-href="http://mongrel2.org">Mongrel2</a> to run the application as a set of
-small processes for each major routing, rather than one monolithic process.  In
-the above two examples, each <b>Tir.start</b> line is a single process.
-
-You can also build on this to flex and warp the size of your processes as you
-need, and locate them or cluster them however you like.  By default it shoots
-for small little processes, but nothing prevents you from doing others.
-
 <h1>Simple Templating Language</h1>
 
 Tir uses embedded Lua as it's templating language, which means you get a real
@@ -144,6 +135,17 @@ languages out there:
 <p>We'll add "{{ q }}" as a new one.</p>
 {% end %}
 </verbatim>
+
+<h1>Multiple Little Processes</h1>
+
+Tir also uses <a href="http://zeromq.org">ZeroMQ</a> and <a
+href="http://mongrel2.org">Mongrel2</a> to run the application as a set of
+small processes for each major routing, rather than one monolithic process.  In
+the above two examples, each <b>Tir.start</b> line is a single process.
+
+You can also build on this to flex and warp the size of your processes as you
+need, and locate them or cluster them however you like.  By default it shoots
+for small little processes, but nothing prevents you from doing others.
 
 <h1>Async Ready</h1>
 
@@ -167,9 +169,12 @@ all the platform libraries you need with LuaRocks.
 
 No more gatekeepers with Lua.
 
-<h1>Status</h1>
+<h1>Getting Started</h1>
 
 Tir is very alpha, but it is being used on a few projects.  Feel free to grab
 the code and if you want to help, then contact zedshaw@zedshaw.com for more
 information.
+
+You can read the [Install], [GettingStarted] and the [ContributorInstructions] for information
+on how to get up and running with Tir.
 

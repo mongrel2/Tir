@@ -1,0 +1,62 @@
+<h1>Installing Tir</h1>
+
+This document is still a rough install guide, so you may have to wiggle the instructions to fit your particular system.  They also do <b>not</b> work on Windows.  Don't even bother.
+
+<h1>Pre-Requisites</h1>
+
+Obviously, you'll need to <a href="http://mongrel2.org/wiki?name=GettingStarted">Install Mongrel2</a> first.
+
+You'll also need the following:
+
+  #  <a href="http://lua.org">Lua 5.1</a>
+  #  <a href="http://luarocks.org/">LuaRocks</a>
+  #  Make sure you can build extensions for Lua.
+
+<h1>Installing Tir</h1>
+
+Because of the way a LuaRocks handles some types of dependencies you have to run these commands to get Tir installed the first time:
+
+<verbatim>
+# go some place safe
+cd /tmp
+
+# become root (watch out!)
+sudo bash
+
+# install dependencies from git and places
+luarocks install lua_signal
+curl -O https://github.com/iamaleksey/lua-zmq/raw/master/rockspecs/lua-zmq-scm-0.rockspec
+luarocks install lua-zmq-scm-0.rockspec
+curl -O https://github.com/jsimmons/mongrel2-lua/raw/master/rockspecs/mongrel2-lua-scm-0.rockspec
+luarocks install mongrel2-lua-scm-0.rockspec
+
+# install tir
+luarocks install http://tir.mongrel2.org/downloads/tir-0.5-1.rockspec
+
+# stop being root
+exit
+</verbatim>
+
+
+<h1>Testing</h1>
+
+After that you should be able to do this:
+
+<verbatim>
+$ tir
+ERROR: that's not a valid command
+USAGE: tir <command> <options>
+$ tir help
+AVAILABLE COMMANDS:
+test
+help
+start
+</verbatim>
+
+<h1>More Documentation</h1>
+
+After you have Tir installed you probably want to read the [GettingStarted] document.
+
+If you want to work on Tir then read the [ContributorInstructions] document.
+
+
