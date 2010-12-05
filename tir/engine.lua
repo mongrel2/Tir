@@ -583,7 +583,7 @@ function run(conn, config)
         -- Get a message from the Mongrel2 server
         good, request = pcall(conn.recv_json, conn)
 
-        if good then
+        if good and request then
             msg_type = request.data.type
 
             if msg_type == 'disconnect' then
