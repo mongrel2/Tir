@@ -1,3 +1,5 @@
+require 'json'
+
 -- Helper function that does a debug dump of the given data.
 function dump(data)
     json.util.printValue({['*'] = data}, '*')
@@ -18,8 +20,8 @@ function update(target, source, keys)
             target[key] = source[key]
         end
     else
-        for k,v in pairs(keys) do
-            target[key] = source[key]
+        for k,v in pairs(source) do
+            target[k] = v
         end
     end
 end

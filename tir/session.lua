@@ -1,3 +1,5 @@
+require 'uuid'
+
 local UUID_TYPE = 'random'
 
 function make_session_id()

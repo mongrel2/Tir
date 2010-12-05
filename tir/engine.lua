@@ -5,12 +5,7 @@
 -- Tir is BSD licensed the same as Mongrel2.
 --
 
-
 require 'tir/strict'
-require 'mongrel2'
-require 'uuid'
-require 'json'
-require 'luasql.sqlite3'
 
 module('Tir', package.seeall)
 

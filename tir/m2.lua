@@ -1,3 +1,5 @@
+require 'mongrel2'
+require 'luasql.sqlite3'
 
 module('Tir.M2', package.seeall)
 
