@@ -3,8 +3,7 @@
 require 'posix'
 require 'signal'
 
-TIME_LOOP = os.time()
-PIDS = {}
+SCRIPT_PIDS = {}
 
 function parse_args(arg)
     if #arg == 0 then return nil end
@@ -27,32 +26,34 @@ function parse_args(arg)
 end
 
 
+local function run_script(script)
+    pid = posix.fork()
 
-signal.signal("SIGINT", function (...)
-    for script, pid in pairs(PIDS) do
-        posix.kill(pid)
+    if pid == 0 then
+        -- in pid, run the script
+        posix.execp("lua", script)
+    else
+        print("Started " .. script .. " PID " .. pid)
+        SCRIPT_PIDS[script] = pid
     end
-end)
+
+    return pid
+end
 
 
 local function run_app(targets)
-    local pids = {}
     local pid
+    local running = {}
 
-    print("\n--------------- APP --------------------")
-
-    for _, script in ipairs(targets) do
-        pid = posix.fork()
-        if pid == 0 then
-            -- in pid, run the script
-            posix.execp("lua", script)
-        else
-            print("Started " .. script .. " PID " .. pid)
-            pids[script] = pid
-        end
+    for script, pid in pairs(SCRIPT_PIDS) do
+        running[script] = posix.kill(pid, 0) == 0
     end
 
-    return pids
+    for _, script in ipairs(targets) do
+        if not running[script] then
+            run_script(script)
+        end
+    end
 end
 
 local function run_tests(test_dir, full)
@@ -70,22 +71,20 @@ local function run_tests(test_dir, full)
     end
 end
 
-local function wait_on_children(pids)
+local function wait_on_children()
     local dead_count = 0
     local child_count = 0
     local p, msg, ret
 
-    -- gotta be a way to get the count of keys without looping
-    for k,v in pairs(pids) do child_count = child_count + 1 end
+    repeat
+        p, msg, ret = posix.wait(-1)
+    until p
 
-    while dead_count < child_count do
-        for script, pid in pairs(pids) do
-            p, msg, ret = posix.wait(pid)
-
-            if p then
-                print("CHILD DIED " .. script .. " PID " .. pid ..":", msg)
-                dead_count = dead_count + 1
-            end
+    for script, pid in pairs(SCRIPT_PIDS) do
+        if p == pid then
+            print("CHILD DIED " .. script .. " PID " .. p ..":", msg)
+            SCRIPT_PIDS[pid] = nil
+            return pid
         end
     end
 end
@@ -94,30 +93,21 @@ end
 COMMANDS = {
     test = function(settings)
         local target = settings.from or "tests"
-        run_tests(target, settings.full ~= nil)
+        if not os.getenv('PROD') then
+            run_tests(target, settings.full ~= nil)
+        else
+            print "Running in PROD mode, won't run tests."
+        end
     end,
 
     start = function(settings)
         local app = settings.app or "./app/*.lua"
+        local time_loop = os.time()
 
         while true do
             local targets = assert(posix.glob(app))
-
-            if not os.getenv('PROD') then
-                COMMANDS.test(settings)
-            else
-                print "Running in PROD mode, won't run tests."
-            end
-
-            PIDS = run_app(targets)
-            wait_on_children(PIDS)
-
-            if os.time() - TIME_LOOP < 1 then
-                print("CYCLING TOO FAST, SLEEPING")
-                posix.sleep(10)
-            else
-                TIME_LOOP = os.time()
-            end
+            run_app(targets)
+            wait_on_children()
         end
     end,
 

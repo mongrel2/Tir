@@ -352,7 +352,7 @@ end
 
 -- Simplistic URL decoding that can handle + space encoding too.
 function url_decode(data)
-    return data:gsub("%+", ' '):gsub('%%([0-9A-F][0-9A-F])', function (s)
+    return data:gsub("%+", ' '):gsub('%%(%x%x)', function (s)
         return string.char(tonumber(s, 16))
     end)
 end

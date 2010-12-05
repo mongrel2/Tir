@@ -1,9 +1,27 @@
+<h1>What Is Tir?</h1>
+
 Tir is an experimental web framework for the <a
 href="http://mongrel2.org/">Mongrel2 webserver</a> and <a
 href="http://www.lua.org/">Lua programming language</a>.  The purpose of Tir is
 to play with the idea of a <b>State Agnostic</b> web framework.  Tir lets you
 create handlers that work in various configurations as needed by your
-application requirements.
+application requirements.  You create your application using a <a
+href="#natural">natural coroutine style</a> of handler, then make another part
+<a href="#stateless">stateless</a>, and still have other parts using an
+<a href="#evented">evented/callback style</a>.
+
+
+<h2>Getting Started</h2>
+
+Tir is very alpha, but it is being used on a few projects.  Feel free to grab
+the code and if you want to help, then contact zedshaw@zedshaw.com for more
+information.
+
+You can read the [Install], [GettingStarted] and the [ContributorInstructions] for information
+on how to get up and running with Tir.
+
+The source to Tir is available at <a
+href="http://tir.mongrel2.org/downloads/tir-0.5-1.tar.gz">http://tir.mongrel2.org/downloads/tir-0.5-1.tar.gz</a>.
 
 
 <h1>Tir's Philosophy</h1>
@@ -20,7 +38,7 @@ strategies for different interfaces you need to design.
 The point though is that different problems are best solved with different state
 management.
 
-<h1>Natural Style</h1>
+<h2><a name="natural">Natural Style</a></h2>
 
 I'm calling the coroutine based handlers "Natural Style" because you write the
 code for them in a more natural way, as if you don't need to worry about routing
@@ -49,7 +67,7 @@ Tir.start {route='/Login', main=login}
 </verbatim>
 
 
-<h1>Stateless Style</h1>
+<h2><a name="stateless">Stateless Style</a></h2>
 
 Handlers can be made "stateless" and they'll work like coroutine handlers, but
 not retain any state.  These are good for one-shot operations and simpler
@@ -80,7 +98,7 @@ end
 Tir.stateless {route='/Search', main=search}
 </verbatim>
 
-<h1>Evented Styles</h1>
+<h2><a name="evented">Evented Style</a></h2>
 
 Tir also supports the alternative "evented" style, which means that URLs are
 mapped to callback functions in your handler.  A simple URL pattern is used to
@@ -117,7 +135,7 @@ In this style, Manage.form is run and then your handlers receive the results to
 work with right away.  You can even change the routing pattern if you don't
 like what I've chosen, or need even more complexity in your life.
 
-<h1>Simple Templating Language</h1>
+<h2>Simple Templating Language</h2>
 
 Tir uses embedded Lua as it's templating language, which means you get a real
 language and not some crippled one someone smarter than you think you
@@ -136,7 +154,7 @@ languages out there:
 {% end %}
 </verbatim>
 
-<h1>Multiple Little Processes</h1>
+<h2>Multiple Little Processes</h2>
 
 Tir also uses <a href="http://zeromq.org">ZeroMQ</a> and <a
 href="http://mongrel2.org">Mongrel2</a> to run the application as a set of
@@ -147,17 +165,17 @@ You can also build on this to flex and warp the size of your processes as you
 need, and locate them or cluster them however you like.  By default it shoots
 for small little processes, but nothing prevents you from doing others.
 
-<h1>Async Ready</h1>
+<h2>Async Ready</h2>
 
 Because Tir uses Mongrel2 it already support async operation, streaming,
 regular HTTP, HTTP long poll, and flash/jssockets.
 
-<h1>No ORM</h1>
+<h2>No ORM</h2>
 
 Tir comes without an ORM by default.  People would probably hate any ORM I
 wrote and there's plenty of options you can add.
 
-<h1>No Core</h1>
+<h2>No Core</h2>
 
 This isn't really a Tir feature, but do you hate when there's bugs in your core
 libraries and that guy who "owns" the broken library refuses to fix it?  Me
@@ -168,13 +186,4 @@ href="http://www.lua.org/manual/5.1/">in a few HTML pages</a> and then install
 all the platform libraries you need with LuaRocks.
 
 No more gatekeepers with Lua.
-
-<h1>Getting Started</h1>
-
-Tir is very alpha, but it is being used on a few projects.  Feel free to grab
-the code and if you want to help, then contact zedshaw@zedshaw.com for more
-information.
-
-You can read the [Install], [GettingStarted] and the [ContributorInstructions] for information
-on how to get up and running with Tir.
 

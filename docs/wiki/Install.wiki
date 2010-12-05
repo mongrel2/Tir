@@ -37,6 +37,8 @@ luarocks install http://tir.mongrel2.org/downloads/tir-0.5-1.rockspec
 exit
 </verbatim>
 
+<b>NOTE:</b> This set of instructions should be one single command that just installs the Tir rockspec.  If you know how to make that happen let me know.
+
 
 <h1>Testing</h1>
 
