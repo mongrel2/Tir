@@ -5,6 +5,9 @@ TAR_FILE=tir-${VERSION}-${REVISION}.tar.gz
 SRC_ROCK=tir-${VERSION}-${REVISION}.src.rock
 EXAMPLES_FILE=tir-examples-${VERSION}-${REVISION}.tar.gz
 
+all:
+	tir test
+
 install:
 	luarocks install lua_signal
 	curl -O https://github.com/iamaleksey/lua-zmq/raw/master/rockspecs/lua-zmq-scm-0.rockspec
