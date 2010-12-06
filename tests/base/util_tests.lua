@@ -65,9 +65,9 @@ context("Tir", function()
         end)
 
         test("load_lines", function()
-            local source = Tir.load_lines("tir/util.lua", 74, 74)
+            local source = Tir.load_lines("tir/util.lua", 76, 76)
             assert_equal(source,
-                     '0074: -- Used for dumping json so it can be displayed to someone.')
+                     '0076: -- Used for dumping json so it can be displayed to someone.')
         end)
     end)
 end)

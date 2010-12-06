@@ -1,4 +1,6 @@
 
+module('Tir', package.seeall)
+
 -- The basic error page HTML.  Nothing fancy, but you can change it if you want.
 local ERROR_PAGE = compile_view [[
 <html><head><title>Tir Error</title></head> 

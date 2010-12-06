@@ -1,6 +1,9 @@
 require 'uuid'
 
+module('Tir', package.seeall)
+
 local UUID_TYPE = 'random'
+local BIG_EXPIRE_TIME = 20
 
 function make_session_id()
     return 'APP-' .. uuid.new(UUID_TYPE)
@@ -8,7 +11,7 @@ end
 
 function make_expires()
     local temp = os.date("*t", os.time())
-    temp.year = temp.year + 20
+    temp.year = temp.year + BIG_EXPIRE_TIME
     return os.date("%a, %d-%b-%Y %X GMT", os.time(temp))
 end
 
@@ -24,7 +27,7 @@ function parse_session_id(cookie)
 end
 
 
-local function json_ident(req)
+function json_ident(req)
     local ident = req.data.session_id
 
     if not ident then
@@ -36,7 +39,7 @@ local function json_ident(req)
 end
 
 
-local function http_cookie_ident(req)
+function http_cookie_ident(req)
     local ident = parse_session_id(req.headers['cookie'])
 
     if not ident then

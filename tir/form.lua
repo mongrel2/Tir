@@ -1,3 +1,5 @@
+module('Tir', package.seeall)
+
 local ENCODING_MATCH = '^%s-([%w/%-]+);*(.*)$'
 local URL_ENCODED_FORM = 'application/x-www-form-urlencoded'
 local MULTIPART_ENCODED_FORM = 'multipart/form-data'

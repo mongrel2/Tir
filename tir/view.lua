@@ -1,3 +1,5 @@
+module('Tir', package.seeall)
+
 TEMPLATES = "views/"
 
 -- Used in template parsing to figure out what each {} does.

@@ -1,3 +1,4 @@
+module('Tir', package.seeall)
 
 -- Creates Web objects that the engine passes to your coroutines.
 function web(conn, main, req, stateless)

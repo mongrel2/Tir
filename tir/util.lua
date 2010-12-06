@@ -1,3 +1,5 @@
+module('Tir', package.seeall)
+
 require 'json'
 
 -- Helper function that does a debug dump of the given data.
