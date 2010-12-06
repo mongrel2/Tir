@@ -1,52 +1,3 @@
-
--- Creates Form objects for validating form input in the coroutines.
-function form(required_fields)
-    local Form = {
-        required_fields = required_fields
-    }
-
-    function Form:requires(params)
-        local errors = {}
-        local had_errors = false
-
-        for _, field in ipairs(self.required_fields) do
-            if not params[field] or #params[field] == 0 then
-                errors[field] = 'This is required.'
-                had_errors = true
-            end
-        end
-
-        if had_errors then
-            params.errors = json.encode(errors)
-            return false
-        else
-            params.errors = nil
-            return true
-        end
-    end
-
-    function Form:clear(params)
-        params.errors = nil
-    end
-
-    function Form:valid(params)
-        local has_required = self:requires(params)
-
-        if has_required and self.required_fields.validator then
-            return self.required_fields.validator(params)
-        else
-            return has_required
-        end
-    end
-
-    function Form:parse(req)
-        return parse_form(req)
-    end
-
-    return Form
-end
-
-
 local ENCODING_MATCH = '^%s-([%w/%-]+);*(.*)$'
 local URL_ENCODED_FORM = 'application/x-www-form-urlencoded'
 local MULTIPART_ENCODED_FORM = 'multipart/form-data'
@@ -107,7 +58,9 @@ function parse_form(req)
         encoding = encoding:lower()
 
         if encoding == URL_ENCODED_FORM then
-            params = url_parse(req.body)
+            if req.body then
+                params = url_parse(req.body)
+            end
         elseif encoding == MULTIPART_ENCODED_FORM then
             params = extract_multipart(req.body, encparams)
             params.multipart = true
@@ -120,4 +73,53 @@ function parse_form(req)
 
     return params
 end
+
+
+-- Creates Form objects for validating form input in the coroutines.
+function form(required_fields)
+    local Form = {
+        required_fields = required_fields
+    }
+
+    function Form:requires(params)
+        local errors = {}
+        local had_errors = false
+
+        for _, field in ipairs(self.required_fields) do
+            if not params[field] or #params[field] == 0 then
+                errors[field] = 'This is required.'
+                had_errors = true
+            end
+        end
+
+        if had_errors then
+            params.errors = json.encode(errors)
+            return false
+        else
+            params.errors = nil
+            return true
+        end
+    end
+
+    function Form:clear(params)
+        params.errors = nil
+    end
+
+    function Form:valid(params)
+        local has_required = self:requires(params)
+
+        if has_required and self.required_fields.validator then
+            return self.required_fields.validator(params)
+        else
+            return has_required
+        end
+    end
+
+    function Form:parse(req)
+        return parse_form(req)
+    end
+
+    return Form
+end
+
 
