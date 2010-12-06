@@ -1,10 +1,54 @@
+
+
 module('Tir', package.seeall)
 
 require 'json'
 
--- Helper function that does a debug dump of the given data.
-function dump(data)
-    json.util.printValue({['*'] = data}, '*')
+
+function table_print(tt, indent, done)
+  local done = done or {}
+  local indent = indent or 0
+  local space = string.rep(" ", indent)
+
+  if type(tt) == "table" then
+    local sb = {}
+
+    for key, value in pairs(tt) do
+      table.insert(sb, space) -- indent it
+
+      if type (value) == "table" and not done [value] then
+        done [value] = true
+        table.insert(sb, "{\n");
+        table.insert(sb, table_print(value, indent + 2, done))
+        table.insert(sb, space) -- indent it
+        table.insert(sb, "}\n");
+      elseif "number" == type(key) then
+        table.insert(sb, string.format("\"%s\" ", tostring(value)))
+      else
+        table.insert(sb, string.format(
+            "%s = \"%s\"\n", tostring(key), tostring(value)))
+       end
+    end
+    return table.concat(sb)
+  else
+    return tt .. "\n"
+  end
+end
+
+function to_string(data)
+    if "nil" == type(data) then
+        return tostring(nil)
+    elseif "table" == type(data) then
+        return table_print(data)
+    elseif  "string" == type(data) then
+        return data
+    else
+        return tostring(data)
+    end
+end
+
+function dump(data, name)
+    print(to_string({name or "*", data}))
 end
 
 -- Helper function that loads a file into ram.
@@ -70,12 +114,6 @@ function url_parse(data, sep)
     end
 
     return result
-end
-
-
--- Used for dumping json so it can be displayed to someone.
-function pretty_json(tab)
-    return json.encode(tab):gsub('","', '",\n"')
 end
 
 

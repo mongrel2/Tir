@@ -6,6 +6,7 @@ SRC_ROCK=tir-${VERSION}-${REVISION}.src.rock
 EXAMPLES_FILE=tir-examples-${VERSION}-${REVISION}.tar.gz
 
 all:
+	m2sh load -db tests/data/config.sqlite -config tests/data/mongrel2.conf
 	tir test
 
 install:

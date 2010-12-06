@@ -1,26 +1,34 @@
 require 'mongrel2'
-require 'luasql.sqlite3'
+require 'mongrel2.config'
 
 module('Tir.M2', package.seeall)
 
-local CONFIG_SQL = "select send_spec, recv_spec from handler where id=(select target_id from route where target_type='handler' and path='%s')"
+function find_handler(m2conf, route, host_name)
+    host_name = host_name or m2conf[1].default_host
 
+    for _, server in ipairs(m2conf) do
+        for _, host in ipairs(server.hosts) do
+            if host.name == host_name then
+                return host.routes[route]
+            end
+        end
+    end
+
+    return nil
+end
 
 -- Loads the Handler config out of the Mongrel2 sqlite config so we don't
 -- have to specify it over and over.
 function load_config(config)
-    local env = assert(luasql.sqlite3())
-    local conn = assert(env:connect(config.config_db))
-    local cur = assert(conn:execute(CONFIG_SQL:format(config.route)))
-    local row = cur:fetch({}, "a")
+    local m2conf = assert(mongrel2.config.read(config.config_db),
+        "Failed to load the mongrel2 config: " .. config.config_db)
 
-    assert(row, "Did not find anything for route " .. config.route)
-    config.sub_addr = row.send_spec
-    config.pub_addr = row.recv_spec
+    local handler = find_handler(m2conf, config.route, config.host)
+    assert(handler, "Failed to find route: " .. config.route ..
+            ". Make sure you set config.host to a host in your mongrel2.conf.")
 
-    cur:close()
-    conn:close()
-    env:close()
+    config.sub_addr = handler.send_spec
+    config.pub_addr = handler.recv_spec
 end
 
 
@@ -36,3 +44,5 @@ function connect(config)
 
     return conn
 end
+
+

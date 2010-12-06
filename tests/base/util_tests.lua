@@ -60,14 +60,9 @@ context("Tir", function()
             assert_equal(expect.pass, parsed.pass)
         end)
 
-        test("pretty_json", function()
-            assert_equal(Tir.pretty_json({test=1, hello=2}), '{"test":1,"hello":2}')
-        end)
-
         test("load_lines", function()
             local source = Tir.load_lines("tir/util.lua", 76, 76)
-            assert_equal(source,
-                     '0076: -- Used for dumping json so it can be displayed to someone.')
+            assert_match('0076: .*', source)
         end)
     end)
 end)

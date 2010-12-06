@@ -24,7 +24,7 @@ local ERROR_PAGE = compile_view [[
 
 -- Reports errors back to the browser so the user has something to work with.
 function report_error(conn, request, err, state)
-    local pretty_req = pretty_json(request)
+    local pretty_req = Tir.to_string {"Request", request}
     local trace = debug.traceback(state.controller, err)
     local info
     local source = nil
