@@ -4,5 +4,5 @@ function test(args)
     Tir.dump(args)
 end
 
-Tir.Task.start(test, 'ipc://run/photos')
+Tir.Task.start { main = test, spec = 'ipc://run/photos' }
 

@@ -6,15 +6,21 @@ local IO_THREADS = 1
 local zmq = require 'zmq'
 local json = require 'json'
 
-function start(main, spec, subscribe, recv_ident)
-    local ctx = assert(zmq.init(IO_THREADS))
-    local conn = assert(ctx:socket(zmq.SUB))
-    conn:setopt(zmq.SUBSCRIBE, subscribe or '')
-    conn:bind(spec)
+function start(config)
+    assert(config.spec, "You need to at least set spec = to your 0MQ socket spec.")
+    assert(config.main, "You must set a main function.")
 
-    if recv_ident then
-        conn:setopt(zmq.IDENTITY, recv_ident)
+    local ctx = assert(zmq.init(config.io_threads or IO_THREADS))
+    local conn = assert(ctx:socket(config.socket_type or zmq.SUB))
+    local main = config.main
+    conn:setopt(zmq.SUBSCRIBE, config.subscribe or '')
+    conn:bind(config.spec)
+
+    if config.recv_ident then
+        conn:setopt(zmq.IDENTITY, config.recv_ident)
     end
+
+    print("BACKGROUND TASK " .. config.spec .. " STARTED.")
 
     while true do
         local data = assert(conn:recv())
@@ -29,20 +35,21 @@ function start(main, spec, subscribe, recv_ident)
     end
 end
 
-function connect(spec, send_ident)
-    local ctx = assert(zmq.init(IO_THREADS))
-    local conn = assert(ctx:socket(zmq.PUB))
-    conn:connect(spec)
+function connect(config)
+    assert(config.spec, "You need to at least set spec = to your 0MQ socket spec.")
 
-    if send_ident then
-        conn:setopt(zmq.IDENTITY, send_ident)
+    local ctx = assert(zmq.init(config.io_threads or IO_THREADS))
+    local conn = assert(ctx:socket(config.socket_type or zmq.PUB))
+    conn:connect(config.spec)
+
+    if config.send_ident then
+        conn:setopt(zmq.IDENTITY, config.send_ident)
     end
 
     local TaskConn = {
         ctx = ctx,
         conn = conn,
-        spec = spec,
-        send_ident = send_ident
+        config = config
     }
 
     function TaskConn:send(target, data)

@@ -1,7 +1,7 @@
 require 'tir/engine'
 require 'posix'
 
-local conn = Tir.Task.connect('ipc://run/photos')
+local conn = Tir.Task.connect { spec = 'ipc://run/photos' }
 
 function main(web, req)
     conn:send('photo', req.headers)
@@ -9,3 +9,4 @@ function main(web, req)
 end
 
 Tir.stateless {route='/Task', main=main}
+

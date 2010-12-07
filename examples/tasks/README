@@ -1,0 +1,27 @@
+This is an example application that just shows how to use the Tir.Task
+module.  Tir.Task lets you start a background task that is fed messages
+using 0MQ.  The Task can be on remote machines, local, and configured
+however you need using 0MQ.
+
+To run this, do the following:
+
+mkdir run tmp logs
+m2sh -db conf/config.sqlite -config conf/mongrel2.conf
+m2sh -db conf/config.sqlite start -every
+
+Now in another window:
+
+tir start
+
+You should see the background task get started.  If you then 
+in yet another window do this:
+
+curl http://localhost:6767/Task
+
+You'll see your request go through, you'll get an OK right back,
+and then the background task will dump the request headers.
+
+To see how this is done, look at the app/test_sender.lua and
+app/test_task.lua files.
+
+
