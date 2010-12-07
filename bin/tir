@@ -84,7 +84,7 @@ local function wait_on_children()
         if p == pid then
             print("CHILD DIED " .. script .. " PID " .. p ..":", msg)
             SCRIPT_PIDS[pid] = nil
-            return pid
+            return script, pid
         end
     end
 end
@@ -102,12 +102,28 @@ COMMANDS = {
 
     start = function(settings)
         local app = settings.app or "./app/*.lua"
-        local time_loop = os.time()
+        local script_times = {}
+
 
         while true do
             local targets = assert(posix.glob(app))
+
+            for _, script in ipairs(targets) do
+                if not script_times[script] then
+                    script_times[script] = os.time() 
+                end
+            end
+
             run_app(targets)
-            wait_on_children()
+            script, pid = wait_on_children()
+            local tick = os.time()
+
+            if tick - script_times[script] < 1 then
+                print("SCRIPT " .. script .. " RESTARTING TOO FAST. Pausing while you fix stuff.")
+                posix.sleep(10)
+            end
+
+            script_times[script] = tick
         end
     end,
 
