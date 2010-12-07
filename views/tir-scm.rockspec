@@ -35,6 +35,15 @@ build = {
 
         lua = {
             ['tir.engine'] = 'tir/engine.lua',
+            ['tir.error'] = 'tir/error.lua',
+            ['tir.form'] = 'tir/form.lua',
+            ['tir.m2'] = 'tir/m2.lua',
+            ['tir.session'] = 'tir/session.lua',
+            ['tir.strict'] = 'tir/strict.lua',
+            ['tir.task'] = 'tir/task.lua',
+            ['tir.util'] = 'tir/util.lua',
+            ['tir.view'] = 'tir/view.lua',
+            ['tir.web'] = 'tir/web.lua',
             ['tir.strict'] = 'tir/strict.lua',
         }
     }
