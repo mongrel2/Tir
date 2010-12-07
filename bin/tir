@@ -121,6 +121,7 @@ COMMANDS = {
             if tick - script_times[script] < 1 then
                 print("SCRIPT " .. script .. " RESTARTING TOO FAST. Pausing while you fix stuff.")
                 posix.sleep(10)
+                tick = os.time()
             end
 
             script_times[script] = tick
