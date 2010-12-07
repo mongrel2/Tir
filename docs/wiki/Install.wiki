@@ -31,7 +31,7 @@ curl -O https://github.com/jsimmons/mongrel2-lua/raw/master/rockspecs/mongrel2-l
 luarocks install mongrel2-lua-scm-0.rockspec
 
 # install tir
-luarocks install http://tir.mongrel2.org/downloads/tir-0.5-1.rockspec
+luarocks install http://tir.mongrel2.org/downloads/tir-0.6-1.rockspec
 
 # stop being root
 exit
