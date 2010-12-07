@@ -165,15 +165,55 @@ You can also build on this to flex and warp the size of your processes as you
 need, and locate them or cluster them however you like.  By default it shoots
 for small little processes, but nothing prevents you from doing others.
 
+<h2>Builtin Background Tasks</h2>
+
+Tir.Task lets you create and connect to ready to run 0MQ background task
+processes so you can offload long running tasks and avoid holding up web
+requests.  They're designed to be very easy to use, but still flexible enough
+to let you do what you need.  By default they use PUB/SUB sockets, but you
+can change that with a setting.  You can also put the background tasks on
+clusters of machines and nearly anything else you need to do.  Messages are
+simply just JSON encoded Lua structures.
+
+Here's a Task that just dumps it's args.
+
+<verbatim>
+require 'tir/engine'
+
+function test(args)
+    Tir.dump(args)
+end
+
+Tir.Task.start { main = test, spec = 'ipc://run/photos' }
+</verbatim>
+
+And here's a sample Handler that can talk to it:
+
+<verbatim>
+require 'tir/engine'
+
+local conn = Tir.Task.connect { spec = 'ipc://run/photos' }
+
+function main(web, req)
+    conn:send('photo', req.headers)
+    web:ok()
+end
+
+Tir.stateless {route='/Task', main=main}
+</verbatim>
+
+
 <h2>Async Ready</h2>
 
 Because Tir uses Mongrel2 it already support async operation, streaming,
 regular HTTP, HTTP long poll, and flash/jssockets.
 
+
 <h2>No ORM</h2>
 
 Tir comes without an ORM by default.  People would probably hate any ORM I
 wrote and there's plenty of options you can add.
+
 
 <h2>No Core</h2>
 

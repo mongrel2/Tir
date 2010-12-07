@@ -1,5 +1,4 @@
 require 'tir/engine'
-require 'posix'
 
 local conn = Tir.Task.connect { spec = 'ipc://run/photos' }
 
