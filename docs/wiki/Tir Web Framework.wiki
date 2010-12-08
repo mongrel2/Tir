@@ -21,7 +21,7 @@ You can read the [Install], [GettingStarted] and the [ContributorInstructions] f
 on how to get up and running with Tir.
 
 The source to Tir is available at <a
-href="http://tir.mongrel2.org/downloads/tir-0.6-1.tar.gz">http://tir.mongrel2.org/downloads/tir-0.6-1.tar.gz</a>.
+href="http://tir.mongrel2.org/downloads/tir-0.7-1.tar.gz">http://tir.mongrel2.org/downloads/tir-0.7-1.tar.gz</a>.
 
 
 <h1>Tir's Philosophy</h1>

@@ -3,7 +3,7 @@
 Tir right now is probably a little hard to setup, so make sure you went through
 the [Install] instructions before you do anything.  Once you have Tir installed
 you can grab the <a
-href="http://tir.mongrel2.org/downloads/tir-examples-0.6-1.tar.gz">http://tir.mongrel2.org/downloads/tir-examples-0.6-1.tar.gz</a> source to get started.
+href="http://tir.mongrel2.org/downloads/tir-examples-0.7-1.tar.gz">http://tir.mongrel2.org/downloads/tir-examples-0.7-1.tar.gz</a> source to get started.
 
 <h1>The Arc Challenge Example</h1>
 
@@ -16,10 +16,10 @@ To get it working, first you have to grab the source and get Mongrel2 running:
 
 <verbatim>
 # get the examples
-curl -O http://tir.mongrel2.org/downloads/tir-examples-0.6-1.tar.gz
+curl -O http://tir.mongrel2.org/downloads/tir-examples-0.7-1.tar.gz
 
 # untar them and go into the arc_challenge
-tar -xzvf tir-examples-0.6-1.tar.gz
+tar -xzvf tir-examples-0.7-1.tar.gz
 cd examples/arc_challenge/
 
 # get mongrel2 setup
