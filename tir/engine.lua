@@ -99,7 +99,7 @@ function run(conn, config)
 
     while true do
         -- Get a message from the Mongrel2 server
-        good, request = pcall(conn.recv_json, conn)
+        good, request, err = pcall(conn.recv, conn)
 
         if good and request then
             msg_type = request.data.type
@@ -121,7 +121,7 @@ function run(conn, config)
                 end
             end
         else
-            print("FATAL ERROR", good, request)
+            print("FATAL ERROR", good, request, err)
         end
     end
 end
