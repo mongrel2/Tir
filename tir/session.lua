@@ -1,12 +1,13 @@
-require 'uuid'
+require 'md5'
 
 module('Tir', package.seeall)
 
 local UUID_TYPE = 'random'
 local BIG_EXPIRE_TIME = 20
+math.randomseed(os.time())
 
 function make_session_id()
-    return 'APP-' .. uuid.new(UUID_TYPE)
+    return 'APP-' .. md5.sumhexa(tostring(math.random()))
 end
 
 function make_expires()

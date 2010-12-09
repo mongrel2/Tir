@@ -1,4 +1,4 @@
-VERSION=0.7
+VERSION=0.8
 REVISION=1
 SPEC_FILE=tir-${VERSION}-${REVISION}.rockspec
 TAR_FILE=tir-${VERSION}-${REVISION}.tar.gz
@@ -15,6 +15,7 @@ install:
 	luarocks install lua-zmq-scm-0.rockspec
 	curl -O https://github.com/jsimmons/mongrel2-lua/raw/master/rockspecs/mongrel2-lua-scm-0.rockspec
 	luarocks install mongrel2-lua-scm-0.rockspec
+	luarocks install http://luarocks.org/repositories/rocks/luaposix-5.1.2-1.rockspec
 	luarocks install http://tir.mongrel2.org/downloads/tir-${VERSION}-${REVISION}.rockspec
 
 build:

@@ -28,10 +28,11 @@ luarocks install lua_signal
 curl -O https://github.com/iamaleksey/lua-zmq/raw/master/rockspecs/lua-zmq-scm-0.rockspec
 luarocks install lua-zmq-scm-0.rockspec
 curl -O https://github.com/jsimmons/mongrel2-lua/raw/master/rockspecs/mongrel2-lua-scm-0.rockspec
+luarocks install http://luarocks.org/repositories/rocks/luaposix-5.1.2-1.rockspec
 luarocks install mongrel2-lua-scm-0.rockspec
 
 # install tir
-luarocks install http://tir.mongrel2.org/downloads/tir-0.7-1.rockspec
+luarocks install http://tir.mongrel2.org/downloads/tir-0.8-1.rockspec
 
 # stop being root
 exit

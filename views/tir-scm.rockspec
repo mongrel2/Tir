@@ -19,10 +19,8 @@ description = {
 dependencies = {
    "lua >= 5.1",
     "md5",
-    "luuid",
     "luajson",
     "luasql-sqlite3",
-    "luaposix",
     "telescope",
 }
 
