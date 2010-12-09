@@ -5,6 +5,13 @@ require 'signal'
 
 SCRIPT_PIDS = {}
 
+signal.signal("SIGINT", function (...)
+    for script, pid in pairs(PIDS) do
+        posix.kill(pid)
+    end
+end)
+
+
 function parse_args(arg)
     if #arg == 0 then return nil end
 
