@@ -1,13 +1,19 @@
 require 'md5'
+require 'posix'
 
 module('Tir', package.seeall)
 
 local UUID_TYPE = 'random'
 local BIG_EXPIRE_TIME = 20
-math.randomseed(os.time())
+local PID = tonumber(posix.getpid().pid)
+local HOSTID = posix.hostid()
 
+-- yeah not much more secure but a bit better
+math.randomseed(os.time() + PID + HOSTID)
+
+-- TODO: get a better RNG than math.random()
 function make_session_id()
-    return 'APP-' .. md5.sumhexa(tostring(math.random()))
+    return 'APP-' .. md5.sumhexa(tostring(math.random()) .. os.time() .. PID .. HOSTID)
 end
 
 function make_expires()
