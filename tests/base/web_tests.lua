@@ -19,9 +19,11 @@ local fake_conn = {
     end,
 }
 
+local session_id = Tir.make_session_id()
+
 local fake_req = {headers = {
-    PATH = "/test", METHOD = "GET", cookie = Tir.make_session_cookie(Tir.make_session_id()),
-}}
+    PATH = "/test", METHOD = "GET", cookie = Tir.make_session_cookie(session_id),
+}, session_id = session_id}
 
 function assert_sent(conn, expected)
     assert_equal(conn.reply_sent, expected)

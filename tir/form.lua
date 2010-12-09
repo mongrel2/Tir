@@ -71,7 +71,7 @@ function parse_form(req)
         end
     end
 
-    params.__session = parse_session_id(req.session_id)
+    params.__session = req.session_id
 
     return params
 end
