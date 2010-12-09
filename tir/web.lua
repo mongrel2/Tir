@@ -16,12 +16,6 @@ function web(conn, main, req, stateless)
         stateless = stateless
     }
 
-    if req.headers.METHOD == 'JSON' then
-        Web.session_id = req.data.session_id
-    else
-        Web.session_id = parse_session_id(req.headers['cookie'])
-    end
-
     function Web:path()
         return self.req.headers.PATH
     end
@@ -44,7 +38,7 @@ function web(conn, main, req, stateless)
     end
 
     function Web:session()
-        return self.session_id
+        return self.req.session_id
     end
 
     function Web:send(data)

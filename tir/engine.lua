@@ -109,10 +109,10 @@ function run(conn, config)
                 if disconnect then disconnect(request) end
                 print("DISCONNECT", request.conn_id)
             else
-                print("REQUEST " .. config.route .. ":" .. request.conn_id, os.date(), request.headers.PATH, request.headers.METHOD)
-
                 -- always do this so the request is setup also
                 conn_id = ident(request)
+
+                print("REQUEST " .. config.route .. ":" .. request.conn_id, os.date(), request.headers.PATH, request.headers.METHOD, request.session_id)
 
                 if stateless then
                     run_stateless(conn, main, request, before, after)

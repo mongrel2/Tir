@@ -35,6 +35,7 @@ function json_ident(req)
         req.data.session_id = ident
     end
 
+    req.session_id = ident
     return ident
 end
 
@@ -48,8 +49,10 @@ function http_cookie_ident(req)
 
         req.headers['set-cookie'] = cookie
         req.headers['cookie'] = cookie
+        req.session_id = ident
     end
 
+    req.session_id = ident
     return ident
 end
 
