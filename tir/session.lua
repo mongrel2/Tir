@@ -7,13 +7,30 @@ local UUID_TYPE = 'random'
 local BIG_EXPIRE_TIME = 20
 local PID = tonumber(posix.getpid().pid)
 local HOSTID = posix.hostid()
+local RNG_BYTES = 8 -- 64 bits of randomness should be good
+local RNG_DEVICE = '/dev/urandom'
 
--- yeah not much more secure but a bit better
-math.randomseed(os.time() + PID + HOSTID)
+function make_rng()
+    if posix.access(RNG_DEVICE) then
+        local urandom = assert(io.open(RNG_DEVICE))
 
--- TODO: get a better RNG than math.random()
+        return function()
+            return md5.sumhexa(urandom:read(RNG_BYTES) .. os.time() .. PID .. HOSTID)
+        end
+    else
+        print("WARNING! YOU DO NOT HAVE " .. RNG_DEVICE .. ". Your session keys aren't very secure.")
+        math.randomseed(os.time() + PID + HOSTID)
+
+        return function()
+            return md5.sumhexa(tostring(math.random()) .. os.time() .. PID .. HOSTID)
+        end
+    end
+end
+
+local RNG = make_rng()
+
 function make_session_id()
-    return 'APP-' .. md5.sumhexa(tostring(math.random()) .. os.time() .. PID .. HOSTID)
+    return 'APP-' .. RNG()
 end
 
 function make_expires()
