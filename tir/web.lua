@@ -1,5 +1,8 @@
 module('Tir', package.seeall)
 
+local TIR_VERSION='Tir/0.8-a9b52939a3'
+local DEFAULT_CTYPE='text/html'
+
 -- Creates Web objects that the engine passes to your coroutines.
 function web(conn, main, req, stateless)
     local controller
@@ -50,12 +53,12 @@ function web(conn, main, req, stateless)
     end
 
     function Web:redirect(url)
-        self:page("", 303, "See Other", {Location=url})
+        self:page("", 303, "See Other", {Location=url, ['content-type'] = false})
     end
 
     -- reports an error then closes the connection
     function Web:error(data, code, status, headers)
-        self:page(data, code, status, headers)
+        self:page(data, code, status, headers or {['content-type'] = false})
         self:close()
     end
 
@@ -65,11 +68,23 @@ function web(conn, main, req, stateless)
     function Web:forbidden(msg) self:error(msg or 'Forbidden', 403, 'Forbidden') end
     function Web:bad_request(msg) self:error(msg or 'Bad Request', 400, 'Bad Request') end
 
+    -- Used to send typical web page responses.  If you don't include a content-type then it
+    -- will use DEFAULT_CTYPE.  However, if you set the content-type to false it will remove
+    -- it and not use one.
     function Web:page(data, code, status, headers)
         headers = headers or {}
 
         if self.req.headers['set-cookie'] then
             headers['set-cookie'] = self.req.headers['set-cookie']
+        end
+
+        headers['server'] = TIR_VERSION
+        local ctype = headers['content-type']
+
+        if ctype == nil then
+            headers['content-type'] = DEFAULT_CTYPE
+        elseif ctype == false then
+            headers['content-type'] = nil
         end
 
         return self.conn:reply_http(self.req, data, code, status, headers)
@@ -121,3 +136,4 @@ function web(conn, main, req, stateless)
 
     return Web
 end
+
