@@ -97,6 +97,23 @@ local function wait_on_children()
 end
 
 
+local function glob_app(app)
+        if app then
+            return assert(posix.glob(app))
+        else
+            -- first get any right in the app dir
+            local codes = posix.glob('app/*.lua') or {}
+           
+            -- then go recursive on it
+            for _,script in ipairs(posix.glob('app/**/*.lua') or {}) do
+                codes[#codes + 1] = script
+            end
+
+            return codes
+        end
+end
+
+
 COMMANDS = {
     test = function(settings)
         local target = settings.from or "tests"
@@ -108,12 +125,11 @@ COMMANDS = {
     end,
 
     start = function(settings)
-        local app = settings.app or "./app/*.lua"
         local script_times = {}
 
 
         while true do
-            local targets = assert(posix.glob(app))
+            local targets = glob_app(settings.app)
 
             for _, script in ipairs(targets) do
                 if not script_times[script] then
