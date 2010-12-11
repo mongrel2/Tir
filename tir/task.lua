@@ -26,8 +26,11 @@ function start(config)
         local data = assert(conn:recv())
 
         if data then
-            local prefix, payload = data:match("^(%w+) (.+)$")
+            local prefix, payload = data:match("^([%w_]+) (.+)$")
+            assert(prefix, "Invalid task request, no prefix given: " .. data)
+            assert(payload, "Invalid task request, no payload: " .. data)
             local req = assert(json.decode(payload))
+
             main(req)
         else
             main(data)
