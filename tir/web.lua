@@ -52,6 +52,10 @@ function web(conn, main, req, stateless)
         self.conn:close(self.req)
     end
 
+    function Web:json(data, ctype)
+        self:page(json.encode(data), 200, "OK", {['content-type'] = ctype or 'application/json'})
+    end
+
     function Web:redirect(url)
         self:page("", 303, "See Other", {Location=url, ['content-type'] = false})
     end
