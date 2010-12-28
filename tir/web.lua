@@ -27,6 +27,10 @@ function web(conn, main, req, stateless)
         return self.req.headers.METHOD
     end
 
+    function Web:request_is_json()
+        return self.req.headers['x-requested-with'] == "XMLHttpRequest"
+    end
+
     function Web:zap_session()
         -- to zap the session we just set a new random cookie instead
         self:set_cookie(make_session_cookie())
