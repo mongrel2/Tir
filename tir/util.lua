@@ -18,7 +18,7 @@ function table_print(tt, indent, done)
 
       if type (value) == "table" and not done [value] then
         done [value] = true
-        table.insert(sb, "{\n");
+        table.insert(sb, key .. " = {\n");
         table.insert(sb, table_print(value, indent + 2, done))
         table.insert(sb, space) -- indent it
         table.insert(sb, "}\n");

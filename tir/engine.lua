@@ -99,9 +99,9 @@ function run(conn, config)
 
     while true do
         -- Get a message from the Mongrel2 server
-        good, request, err = pcall(conn.recv, conn)
+        request, err = conn:recv()
 
-        if good and request then
+        if request and not err then
             msg_type = request.data.type
 
             if msg_type == 'disconnect' then
@@ -137,7 +137,7 @@ function start(config)
     config.ident = config.ident or default_ident
 
     Tir.M2.load_config(config)
-    conn = assert(Tir.M2.connect(config), "Failed to connect to Mongrel2.")
+    local conn = assert(Tir.M2.connect(config), "Failed to connect to Mongrel2.")
 
     -- Run the engine
     run(conn, config)
@@ -178,5 +178,10 @@ function evented(handler, pattern)
     end
 
     Tir.start(config)
+end
+
+-- Mostly used in testing to inspect on running states.
+function get_state(ident)
+    return STATE[ident]
 end
 
