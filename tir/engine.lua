@@ -172,7 +172,7 @@ function evented(handler, pattern)
 
             handler[action](web, req, params)
         else
-            print(("Action %s not found for handler %s."):format(action, route))
+            print(("Action %s not found for handler %s."):format(action, config.route))
             web:not_found()
         end
     end

@@ -124,4 +124,14 @@ function form(required_fields)
     return Form
 end
 
+-- Mostly used in tir/testing.lua
+function form_encode(data, sep)
+    local result = {}
+
+    for k,v in pairs(data) do
+        result[#result + 1] = Tir.url_encode(k) .. '=' .. Tir.url_encode(v)
+    end
+
+    return table.concat(result, sep or '&')
+end
 

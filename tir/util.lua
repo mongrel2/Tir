@@ -96,6 +96,13 @@ function url_decode(data)
     end)
 end
 
+-- Simplistic URL encoding
+function url_encode(data)
+    return data:gsub("\n","\r\n"):gsub("([^%w%-%-%.])", 
+        function (c) return ("%%%02X"):format(string.byte(c)) 
+    end)
+end
+
 -- Basic URL parsing that handles simple key=value&key=value setups
 -- and decodes both key and value.
 function url_parse(data, sep)

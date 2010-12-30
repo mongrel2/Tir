@@ -28,8 +28,12 @@ function web(conn, main, req, stateless)
     end
 
     function Web:request_is_json()
-        return self.req.headers['x-requested-with'] == "XMLHttpRequest" or
-            self.req.headers.METHOD == "JSON"
+        return self.req.headers.METHOD == "JSON" or
+            self.req.headers['content-type'] == 'application/json'
+    end
+
+    function Web:request_is_xhr()
+        return self.req.headers['x-requested-with'] == "XMLHttpRequest"
     end
 
     function Web:zap_session()
