@@ -22,7 +22,7 @@ local STATE = setmetatable({}, {__mode="k"})
 local CONFIG_FILE="conf/config.lua"
 
 local function exec_state(state, request, before, after, action_func)
-    local good, err 
+    local good, err
 
     if before then
         good, err = pcall(before, state, request)
@@ -184,4 +184,5 @@ end
 function get_state(ident)
     return STATE[ident]
 end
+
 
