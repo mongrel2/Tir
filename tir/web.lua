@@ -67,12 +67,14 @@ function web(conn, main, req, stateless)
 
     function Web:redirect(url)
         self:page("", 303, "See Other", {Location=url, ['content-type'] = false})
+        return true
     end
 
     -- reports an error then closes the connection
     function Web:error(data, code, status, headers)
         self:page(data, code, status, headers or {['content-type'] = false})
         self:close()
+        return false
     end
 
     -- a bunch of common errors and responses
