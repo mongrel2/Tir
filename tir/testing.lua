@@ -106,8 +106,10 @@ end
 
 -- Replaces the base start with one that creates a fake m2 connection.
 Tir.start = function(config)
-    setfenv(assert(loadfile(CONFIG_FILE)), config)()
-    TEMPLATES = config.templates or TEMPLATES
+    config = Tir.update_config(config, 'conf/testing.lua')
+
+    config.methods = config.methods or Tir.DEFAULT_ALLOWED_METHODS
+
     config.ident = config.ident or Tir.default_ident
 
     local conn = FakeConnect(config)

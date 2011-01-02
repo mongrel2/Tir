@@ -20,7 +20,7 @@ require 'tir/task'
 
 local STATE = setmetatable({}, {__mode="k"})
 local CONFIG_FILE="conf/config.lua"
-local DEFAULT_ALLOWED_METHODS = {GET = true, POST = true, PUT = true, JSON = true}
+DEFAULT_ALLOWED_METHODS = {GET = true, POST = true, PUT = true, JSON = true, XML = true}
 
 local function exec_state(state, request, before, after, action_func)
     local good, err
@@ -133,16 +133,22 @@ function run(conn, config)
     end
 end
 
+function update_config(config, config_file)
+    local originals = Tir.clone(config)
+    setfenv(assert(loadfile(config_file)), config)()
+    Tir.update(config, originals)
+
+    return config
+end
+
+
 -- Starts a Tir engine, wiring up all the stuff we need for this process
 -- using the given config.  The config is expected to have at least
 -- {route='/path', main=handler_func}.  In addition to that you can put
 -- other settings that are common to all handlers in CONFIG_FILE (conf/config.lua).
 -- Options you can override are: templates, ident, sender_id, sub_addr, pub_addr, io_threads
 function start(config)
-    local originals = Tir.clone(config)
-    setfenv(assert(loadfile(CONFIG_FILE)), config)()
-    Tir.update(config, originals)
-
+    config = update_config(config, config.config_file or CONFIG_FILE)
     TEMPLATES = config.templates or TEMPLATES
     config.ident = config.ident or default_ident
 
