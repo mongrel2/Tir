@@ -166,13 +166,14 @@ function evented(handler, pattern)
 
     config.main = function (web, req)
         local action, extra = web:path():match(pattern)
+        local action_func = handler[action or 'index']
 
-        if action and handler[action] then
-            local params = handler.form:parse(req)
+        if action_func then
+            local params = handler.form and handler.form:parse(req) or {}
 
-            handler[action](web, req, params)
+            action_func(web, req, params)
         else
-            print(("Action %s not found for handler %s."):format(action, config.route))
+            print(("Action %s not found for handler %s."):format(action or 'index', config.route))
             web:not_found()
         end
     end
