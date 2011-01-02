@@ -139,12 +139,10 @@ end
 -- other settings that are common to all handlers in CONFIG_FILE (conf/config.lua).
 -- Options you can override are: templates, ident, sender_id, sub_addr, pub_addr, io_threads
 function start(config)
-    local host = config.host
+    local originals = Tir.clone(config)
     setfenv(assert(loadfile(CONFIG_FILE)), config)()
-    -- TODO: make the config not override the script
-    config.host = host or config.host
+    Tir.update(config, originals)
 
-    Tir.dump(config)
     TEMPLATES = config.templates or TEMPLATES
     config.ident = config.ident or default_ident
 
