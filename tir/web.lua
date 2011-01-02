@@ -1,6 +1,7 @@
 module('Tir', package.seeall)
 
-local TIR_VERSION='Tir/0.8-a9b52939a3'
+TIR_VERSION='Tir/0.8-a9b52939a3'
+
 local DEFAULT_CTYPE='text/html'
 
 -- Creates Web objects that the engine passes to your coroutines.

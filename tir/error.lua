@@ -46,3 +46,12 @@ function report_error(conn, request, err, state)
     print("ERROR", err)
 end
 
+
+function basic_error(conn, req, body, code, status, headers)
+    headers = headers or {}
+    headers['content-type'] = 'text/plain'
+    headers['server'] = TIR_VERSION
+
+    conn:reply_http(req, body, code, status, headers)
+end
+

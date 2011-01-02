@@ -20,6 +20,7 @@ require 'tir/task'
 
 local STATE = setmetatable({}, {__mode="k"})
 local CONFIG_FILE="conf/config.lua"
+local DEFAULT_ALLOWED_METHODS = {GET = true, POST = true, PUT = true, JSON = true}
 
 local function exec_state(state, request, before, after, action_func)
     local good, err
@@ -102,22 +103,28 @@ function run(conn, config)
         request, err = conn:recv()
 
         if request and not err then
-            msg_type = request.data.type
-
-            if msg_type == 'disconnect' then
-                -- The client has disconnected
-                if disconnect then disconnect(request) end
-                print("DISCONNECT", request.conn_id)
+            if not config.methods[request.headers.METHOD] then
+                basic_error(conn, request, "Method Not Allowed",
+                    405, "Method Not Allowed", {Allow = config.allowed_methods_header}
+                )
             else
-                -- always do this so the request is setup also
-                conn_id = ident(request)
+                msg_type = request.data.type
 
-                print("REQUEST " .. config.route .. ":" .. request.conn_id, os.date(), request.headers.PATH, request.headers.METHOD, request.session_id)
-
-                if stateless then
-                    run_stateless(conn, main, request, before, after)
+                if msg_type == 'disconnect' then
+                    -- The client has disconnected
+                    if disconnect then disconnect(request) end
+                    print("DISCONNECT", request.conn_id)
                 else
-                    run_coro(main, conn, request, conn_id, before, after)
+                    -- always do this so the request is setup also
+                    conn_id = ident(request)
+
+                    print("REQUEST " .. config.route .. ":" .. request.conn_id, os.date(), request.headers.PATH, request.headers.METHOD, request.session_id)
+
+                    if stateless then
+                        run_stateless(conn, main, request, before, after)
+                    else
+                        run_coro(main, conn, request, conn_id, before, after)
+                    end
                 end
             end
         else
@@ -135,6 +142,17 @@ function start(config)
     setfenv(assert(loadfile(CONFIG_FILE)), config)()
     TEMPLATES = config.templates or TEMPLATES
     config.ident = config.ident or default_ident
+
+    -- we want to config fast default methods so we can abort any that aren't
+    -- in the whitelist
+    config.methods = config.methods or DEFAULT_ALLOWED_METHODS
+    allowed = {}
+
+    for m, yes in pairs(config.methods) do
+        if yes then allowed[#allowed + 1] = m end
+    end
+
+    config.allowed_methods_header = table.concat(allowed, ' ')
 
     Tir.M2.load_config(config)
     local conn = assert(Tir.M2.connect(config), "Failed to connect to Mongrel2.")
