@@ -72,11 +72,17 @@ end
 -- Otherwise it returns a function that reloads the template since you're
 -- in developer mode.
 function view(name)
+    assert(posix.access(TEMPLATES .. name), "Template " .. TEMPLATES .. name .. " does not exist or wrong permissions.")
+
     if os.getenv('PROD') then
-        return compile_view(load_file(TEMPLATES, name), name)
+        local tempf = load_file(TEMPLATES, name)
+        return compile_view(tempf, name)
     else
         return function (params)
-            return compile_view(load_file(TEMPLATES, name), name)(params)
+            local tempf = load_file(TEMPLATES, name)
+            assert(tempf, "Template " .. TEMPLATES .. name .. " does not exist.")
+
+            return compile_view(tempf, name)(params)
         end
     end
 end
