@@ -196,7 +196,13 @@ function evented(handler, pattern)
         local action_func = handler[action or 'index']
 
         if action_func then
-            local params = handler.form and handler.form:parse(req) or {}
+            local params
+
+            if handler.form then
+                params = handler.form:parse(req)
+            else 
+                params = Tir.parse_form(req)
+            end
 
             action_func(web, req, params)
         else
