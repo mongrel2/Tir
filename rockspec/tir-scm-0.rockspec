@@ -1,8 +1,8 @@
 package = "tir"
-version = "scm"
+version = "scm-0"
 
 source = { }
-source.url = "http://tir.mongrel2.org/downloads/tir-scm.tar.gz"
+source.url = "http://tir.mongrel2.org/downloads/tir-scm-0.tar.gz"
 
 description = {
    summary = "Tir Mongrel2/Lua Web Framework",

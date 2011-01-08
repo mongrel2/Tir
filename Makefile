@@ -24,7 +24,7 @@ build:
 	cd tmp && unzip tir-${VERSION}.zip && mv tir-${VERSION} tir-${VERSION}-${REVISION} && tar -czf ${TAR_FILE} tir-${VERSION}-${REVISION}
 	cd tmp/tir-${VERSION}-${REVISION} && tar -czf ../${EXAMPLES_FILE} examples
 	lua tools/specgen.lua ${VERSION}-${REVISION} tmp/${SPEC_FILE} tmp/${TAR_FILE}
-	lua tools/specgen.lua scm rockspec/tir-scm-0.rockspec
+	lua tools/specgen.lua scm-0 rockspec/tir-scm-0.rockspec
 
 dist: build
 	rsync -azv tmp/${TAR_FILE} tmp/${SPEC_FILE} tmp/${EXAMPLES_FILE} ${USER}@mongrel2.org:deployment/files/tir/downloads/
