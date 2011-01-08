@@ -3,7 +3,7 @@ require 'md5'
 
 local version, target, source_tar = unpack(arg)
 
-local spec = Tir.view('tir-scm.rockspec')
+local spec = Tir.view('tir-scm-0.rockspec')
 local tar_md5 = ""
 
 if source_tar then
