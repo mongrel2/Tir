@@ -20,5 +20,5 @@ local function arc(web, req)
 end
 
 
-Tir.start {route = '/arc', main=arc}
+Tir.start {route = '/Arc', main=arc}
 

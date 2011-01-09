@@ -25,3 +25,10 @@ To see how this is done, look at the app/test_sender.lua and
 app/test_task.lua files.
 
 
+UNIT TESTS
+==========
+
+There are no unit test demos in this because I haven't worked
+on how you'd wire up the handlers and tasks correctly in the
+tir/testing framework.
+

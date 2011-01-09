@@ -161,7 +161,7 @@ function route_request(req)
         end
     end
 
-    assert(false, ("Request for %q path didn't match any loaded handlers."):format(pattern))
+    assert(false, ("Request for %q path didn't match any loaded handlers."):format(req.headers.PATH))
 end
 
 
@@ -234,13 +234,19 @@ function browser(name, session_id, conn_id)
         return self:expect(expect or { code = 200 })
     end
 
-    function Browser:submit(path, form, headers)
+    function Browser:submit(path, form, expect, headers)
         local body = Tir.form_encode(form)
+        headers = headers or {}
+
+        expect = expect or {code = 200}
+        if not expect.code then expect.code = 200 end
 
         headers['content-type'] = "application/x-www-form-urlencoded"
         headers['content-length'] = #body
 
         self:send("POST", path, nil, body, headers)
+
+        return self:expect(expect)
     end
 
     function Browser:xhr(path, form, expect)
