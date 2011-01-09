@@ -21,7 +21,7 @@ You can read the [Install], [GettingStarted] and the [ContributorInstructions] f
 on how to get up and running with Tir.
 
 The source to Tir is available at <a
-href="http://tir.mongrel2.org/downloads/tir-0.8-1.tar.gz">http://tir.mongrel2.org/downloads/tir-0.8-1.tar.gz</a>.
+href="http://tir.mongrel2.org/downloads/tir-0.9-1.tar.gz">http://tir.mongrel2.org/downloads/tir-0.9-1.tar.gz</a>.
 
 
 <h1>Tir's Philosophy</h1>
@@ -202,6 +202,11 @@ end
 Tir.stateless {route='/Task', main=main}
 </verbatim>
 
+<h2>Unit Test Support</h2>
+
+New in 0.9, Tir now has decent unit testing in the <b>tir/testing</b> library
+and there's a sample test in the [GettingStarted] guide that shows how it's
+done.
 
 <h2>Async Ready</h2>
 
