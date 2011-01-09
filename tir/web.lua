@@ -1,6 +1,6 @@
 module('Tir', package.seeall)
 
-TIR_VERSION='Tir/0.8-a9b52939a3'
+TIR_VERSION='Tir/0.9-fd93841f69'
 
 local DEFAULT_CTYPE='text/html'
 
