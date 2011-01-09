@@ -3,7 +3,7 @@
 Tir right now is probably a little hard to setup, so make sure you went through
 the [Install] instructions before you do anything.  Once you have Tir installed
 you can grab the <a
-href="http://tir.mongrel2.org/downloads/tir-examples-0.8-1.tar.gz">http://tir.mongrel2.org/downloads/tir-examples-0.8-1.tar.gz</a> source to get started.
+href="http://tir.mongrel2.org/downloads/tir-examples-0.9-1.tar.gz">http://tir.mongrel2.org/downloads/tir-examples-0.9-1.tar.gz</a> source to get started.
 
 <h1>The Arc Challenge Example</h1>
 
@@ -16,10 +16,10 @@ To get it working, first you have to grab the source and get Mongrel2 running:
 
 <verbatim>
 # get the examples
-curl -O http://tir.mongrel2.org/downloads/tir-examples-0.8-1.tar.gz
+curl -O http://tir.mongrel2.org/downloads/tir-examples-0.9-1.tar.gz
 
 # untar them and go into the arc_challenge
-tar -xzvf tir-examples-0.8-1.tar.gz
+tar -xzvf tir-examples-0.9-1.tar.gz
 cd examples/arc_challenge/
 
 # get mongrel2 setup
@@ -37,17 +37,72 @@ tir start
 Which should look like this:
 
 <verbatim>
----------------- TESTS -----------------
-
--------------- NO TESTS ----------------
-  You must work at a startup.
-
---------------- APP --------------------
-Started ./app/arc_challenge.lua PID 4425
-CONNECTING	/arc	38f857b8-cbaa-4b58-9271-0d36c27813c4	tcp://127.0.0.1:9990	tcp://127.0.0.1:9989
+Started ./app/arc_challenge.lua PID 3301
+CONNECTING	/Arc	38f857b8-cbaa-4b58-9271-0d36c27813c4	tcp://127.0.0.1:9990	tcp://127.0.0.1:9989
 </verbatim>
 
-Finally, go to http://localhost:6767/arc to try it out.
+Finally, go to http://localhost:6767/Arc to try it out.
+
+<h1>Unit Tests</h1>
+
+There's a "complete enough" unit testing framework that should work with any of the Lua
+testing framework out there.  If you require 'tir/testing' in a test file then you get
+the ability to run fake browsers against your handlers and have the tests validate
+that they're working.  The framework also supports doing Xhr requests (JSON, AJAX),
+form submits, URL clicks, checking return codes, and matching patterns in content.
+
+To run the tests, make sure that <a href="https://github.com/norman/telescope">Telescope</a>
+is installed then run:
+
+<verbatim>
+$ tir test
+</verbatim>
+
+Your output should look like this:
+
+<verbatim>
+---------------- TESTS -----------------
+REQUEST /Arc:2	Sun Jan  9 11:55:23 2011	/Arc	GET	APP-05f6f772965d8473e11dfbc93e40ac39
+REQUEST /Arc:2	Sun Jan  9 11:55:23 2011	/Arc	POST	APP-05f6f772965d8473e11dfbc93e40ac39
+REQUEST /Arc:2	Sun Jan  9 11:55:23 2011	/Arc	GET	APP-05f6f772965d8473e11dfbc93e40ac39
+REQUEST /Arc:2	Sun Jan  9 11:55:23 2011	/Arc	GET	APP-05f6f772965d8473e11dfbc93e40ac39
+1 test 1 passed 2 assertions 0 failed 0 errors 0 unassertive 0 pending
+</verbatim>
+
+Unit tests are very simple, and just do basic assert calls to make sure everything is
+working right.  Here's the test code for what you just ran from <b>tests/app_tests/arc_challenge_tests.lua</b>:
+
+<verbatim>
+require 'tir/testing'
+require 'app/arc_challenge'
+
+context("Arc Challenge", function()
+    context("interaction", function()
+        test("do it", function()
+            local tester = Tir.Tests.browser("tester")
+
+            -- click assumes you want a 200 all the time and just returns
+            -- the response it got
+            local resp = tester:click("/Arc")
+            assert_match(".*Tir Arc Challenge.*form.*", resp.body) 
+
+            -- you can also pass what you expect in as another parameter
+            -- with values that are converted to strings and then pattern matched
+            resp = tester:submit("/Arc", {msg = "Hello!"}, {body = ".*click here.*"})
+
+            resp = tester:click("/Arc", {code = 200, body = ".*You said Hello!.*"})
+
+            tester:click("/Arc")
+
+            -- we can also make sure that this handler exited, or
+            -- in this case didn't since it's a permanent loop
+            assert_false(tester:exited())
+        end)
+    end)
+end)
+</verbatim>
+
+
 
 <h2>Restarting Tir</h2>
 
@@ -98,7 +153,7 @@ local function arc(web, req)
 end
 
 
-Tir.start {route = '/arc', main=arc}
+Tir.start {route = '/Arc', main=arc}
 </verbatim>
 
 What this code does is setup all the pages it needs and a form to
@@ -148,7 +203,7 @@ main = Server(
     default_host="(.+)"
     name="main"
     port=6767
-    hosts=[ Host(name="(.+)", routes={ '/arc': arc }) ]
+    hosts=[ Host(name="(.+)", routes={ '/Arc': arc }) ]
 )
 
 settings = {"zeromq.threads": 1}
@@ -172,7 +227,7 @@ Alright, so how does the <b>tir start</b> command figure this all out?
 In your code you have this line:
 
 <verbatim>
-Tir.start {route = '/arc', main=arc}
+Tir.start {route = '/Arc', main=arc}
 </verbatim>
 
 That one line actually opens up the <b>conf/config.sqlite</b> Mongrel2 
