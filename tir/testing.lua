@@ -251,8 +251,7 @@ function browser(name, session_id, conn_id)
 
     function Browser:xhr(path, form, expect)
         local headers = {['x-requested-with'] = "XMLHttpRequest"}
-        self:submit(path, form, headers)
-        return self:expect(expect or { code = 200 })
+        return self:submit(path, form, expect, headers)
     end
 
     function Browser:query(path, params, expect)
