@@ -5,18 +5,18 @@
 -- Tir is BSD licensed the same as Mongrel2.
 --
 
-require 'tir/strict'
+require 'tir.strict'
 
 module('Tir', package.seeall)
 
-require 'tir/util'
-require 'tir/view'
-require 'tir/form'
-require 'tir/session'
-require 'tir/error'
-require 'tir/web'
-require 'tir/m2'
-require 'tir/task'
+require 'tir.util'
+require 'tir.view'
+require 'tir.form'
+require 'tir.session'
+require 'tir.error'
+require 'tir.web'
+require 'tir.m2'
+require 'tir.task'
 
 local STATE = setmetatable({}, {__mode="k"})
 local CONFIG_FILE="conf/config.lua"

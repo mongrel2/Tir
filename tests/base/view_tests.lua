@@ -1,7 +1,7 @@
 require 'tir/engine'
 
 local TEST_TEMPLATE = [[This is a {{ test }}.]]
-local ALL_ACTIONS = [[{% if test == 1 then %}{{ hello }}{% elseif test == 2 then %}{< hello >}{% else %}{( "tir-scm.rockspec" )}{% end %}]]
+local ALL_ACTIONS = [[{% if test == 1 then %}{{ hello }}{% elseif test == 2 then %}{< hello >}{% else %}{( "tir-scm-0.rockspec" )}{% end %}]]
 
 local ALL_ACTION_BIG_RESULT = nil
 
@@ -15,7 +15,7 @@ context("Tir", function()
         end)
 
         test("view", function()
-            local tmpl = Tir.view("tir-scm.rockspec")
+            local tmpl = Tir.view("tir-scm-0.rockspec")
             assert_not_nil(tmpl)
             -- we use this in the next test
             ALL_ACTION_BIG_RESULT = tmpl {VERSION=10, MD5=""}
