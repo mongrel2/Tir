@@ -21,7 +21,7 @@ dependencies = {
    "luaposix == 5.1.2",
     "md5",
     "luajson",
-    "luasql-sqlite3",
+    "lsqlite3",
     "telescope",
 }
 
