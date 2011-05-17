@@ -1,12 +1,12 @@
-require 'mongrel2'
-require 'mongrel2.config'
+local mongrel2 = require 'mongrel2'
+mongrel2.config = require 'mongrel2.config'
 
 module('Tir.M2', package.seeall)
 
 function find_handler(m2conf, route, host_name)
-    host_name = host_name or m2conf[1].default_host
+    host_name = host_name or m2conf.servers[1].default_host
 
-    for _, server in ipairs(m2conf) do
+    for _, server in ipairs(m2conf.servers) do
         for _, host in ipairs(server.hosts) do
             if host.name == host_name then
                 return host.routes[route]
