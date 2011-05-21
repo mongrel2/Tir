@@ -16,10 +16,10 @@ To get it working, first you have to grab the source and get Mongrel2 running:
 
 <verbatim>
 # get the examples
-curl -O http://tir.mongrel2.org/downloads/tir-examples-0.9-1.tar.gz
+curl -O http://tir.mongrel2.org/downloads/tir-examples-0.9-2.tar.gz
 
 # untar them and go into the arc_challenge
-tar -xzvf tir-examples-0.9-1.tar.gz
+tar -xzvf tir-examples-0.9-2.tar.gz
 cd examples/arc_challenge/
 
 # get mongrel2 setup

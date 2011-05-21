@@ -1,5 +1,5 @@
 VERSION=0.9
-REVISION=1
+REVISION=2
 SPEC_FILE=tir-${VERSION}-${REVISION}.rockspec
 TAR_FILE=tir-${VERSION}-${REVISION}.tar.gz
 SRC_ROCK=tir-${VERSION}-${REVISION}.src.rock
@@ -13,8 +13,8 @@ install:
 	luarocks install lua_signal
 	curl -O https://github.com/iamaleksey/lua-zmq/raw/master/rockspecs/lua-zmq-scm-0.rockspec
 	luarocks install lua-zmq-scm-0.rockspec
-	curl -O https://github.com/jsimmons/mongrel2-lua/raw/master/rockspecs/mongrel2-lua-scm-0.rockspec
-	luarocks install mongrel2-lua-scm-0.rockspec
+	curl -O https://github.com/jsimmons/mongrel2-lua/raw/master/rockspecs/mongrel2-lua-1.6.1.rockspec
+	luarocks install mongrel2-lua-1.6.1.rockspec
 	luarocks install http://tir.mongrel2.org/downloads/tir-${VERSION}-${REVISION}.rockspec
 
 build:
