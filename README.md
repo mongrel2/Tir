@@ -12,10 +12,9 @@ Getting Started
 ---------------
 
 Tir is very alpha, but it is being used on a few projects. Feel free to grab
-the code and if you want to help, then contact zedshaw@zedshaw.com for more
-information.  You can read the Install, GettingStarted and the
-ContributorInstructions for information on how to get up and running with Tir.
-The source to Tir is available at http://tir.mongrel2.org/downloads/tir-0.9-1.tar.gz.
+the code and if you want to help, then contact zedshaw-AT-zedshaw.com for more
+information.  The source to Tir is available at
+http://tir.mongrel2.org/downloads/tir-0.9-1.tar.gz.
 
 
 Tir's Philosophy
