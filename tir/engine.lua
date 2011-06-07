@@ -43,7 +43,7 @@ local function exec_state(state, request, before, after, action_func)
 end
 
 
-local function run_coro(main, conn, request, conn_id, before, after)
+local function run_coro(main, conn, request, conn_id, before, after, handle_error)
     -- The client has sent data
     local state = STATE[conn_id]
     local good, err
@@ -66,7 +66,7 @@ local function run_coro(main, conn, request, conn_id, before, after)
     end
 
     if not good and err then
-        report_error(conn, request, err, state)
+        handle_error(conn, request, err, state)
     end
 
     -- If the main is done or we got an eror, stop tracking the client
@@ -76,7 +76,7 @@ local function run_coro(main, conn, request, conn_id, before, after)
 end
 
 
-local function run_stateless(conn, main, request, before, after)
+local function run_stateless(conn, main, request, before, after, handle_error)
     local state = web(conn, main, request, true)
 
     local good, err = exec_state(state, request, before, after, function(s,r)
@@ -84,7 +84,7 @@ local function run_stateless(conn, main, request, before, after)
     end)
 
     if not good and err then
-        report_error(conn, request, err, state)
+        handle_error(conn, request, err, state)
     end
 end
 
@@ -97,6 +97,7 @@ function run(conn, config)
     local request, msg_type, controller
     local conn_id
     local stateless = config.stateless or false
+    local handle_error = config.error_handler or report_error
 
     while true do
         -- Get a message from the Mongrel2 server
@@ -121,9 +122,9 @@ function run(conn, config)
                     print("REQUEST " .. config.route .. ":" .. request.conn_id, os.date(), request.headers.PATH, request.headers.METHOD, request.session_id)
 
                     if stateless then
-                        run_stateless(conn, main, request, before, after)
+                        run_stateless(conn, main, request, before, after, handle_error)
                     else
-                        run_coro(main, conn, request, conn_id, before, after)
+                        run_coro(main, conn, request, conn_id, before, after, handle_error)
                     end
                 end
             end
