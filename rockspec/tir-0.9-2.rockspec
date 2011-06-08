@@ -1,5 +1,5 @@
 package = "tir"
-version = "scm-0"
+version = "0.9-2"
 
 source = { }
 source.url = "https://github.com/zedshaw/tir/tarball/v0.9-2"
