@@ -22,8 +22,8 @@
 
 local zmq = require 'zmq'
 
-local connection = require 'mongrel2.connection'
-local util = require 'mongrel2.util'
+local connection = require 'tir.mongrel2.connection'
+local util = require 'tir.mongrel2.util'
 
 local setmetatable = setmetatable
 

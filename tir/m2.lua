@@ -1,5 +1,5 @@
-local mongrel2 = require 'mongrel2'
-mongrel2.config = require 'mongrel2.config'
+local mongrel2 = require 'tir.mongrel2.init'
+mongrel2.config = require 'tir.mongrel2.config'
 
 module('Tir.M2', package.seeall)
 

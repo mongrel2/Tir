@@ -25,7 +25,7 @@ local json = require 'json'
 local tns = require 'tnetstrings'
 local tns_parse = tns.parse
 
-local util = require 'mongrel2.util'
+local util = require 'tir.mongrel2.util'
 
 local pcall, setmetatable, tonumber, unpack = pcall, setmetatable, tonumber, unpack
 

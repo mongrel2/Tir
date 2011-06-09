@@ -23,8 +23,8 @@
 local json = require 'json'
 local zmq = require 'zmq'
 
-local request = require 'mongrel2.request'
-local util = require 'mongrel2.util'
+local request = require 'tir.mongrel2.request'
+local util = require 'tir.mongrel2.util'
 
 local pairs, pcall, setmetatable, tostring = pairs, pcall, setmetatable, tostring
 local insert, concat, format, length = table.insert, table.concat, string.format, string.len 
