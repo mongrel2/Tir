@@ -22,7 +22,7 @@
 
 
 local json = require 'json'
-local tns = require 'tnetstrings'
+local tns = require 'mongrel2.tnetstring'
 local tns_parse = tns.parse
 
 local util = require 'mongrel2.util'
