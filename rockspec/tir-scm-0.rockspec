@@ -39,11 +39,11 @@ build = {
             ['tir.view'] = 'tir/view.lua',
             ['tir.web'] = 'tir/web.lua',
             ['tir.strict'] = 'tir/strict.lua',
-            ["mongrel2.lua"] = "mongrel2/init.lua",
-            ["mongrel2.connection"] = "mongrel2/connection.lua",
-            ["mongrel2.request"]    = "mongrel2/request.lua",
-            ["mongrel2.util"]       = "mongrel2/util.lua",
-            ["mongrel2.config"]     = "mongrel2/config.lua"
+            ["mongrel2.lua"] = "tir/mongrel2/init.lua",
+            ["mongrel2.connection"] = "tir/mongrel2/connection.lua",
+            ["mongrel2.request"]    = "tir/mongrel2/request.lua",
+            ["mongrel2.util"]       = "tir/mongrel2/util.lua",
+            ["mongrel2.config"]     = "tir/mongrel2/config.lua"
         }
     }
 }
