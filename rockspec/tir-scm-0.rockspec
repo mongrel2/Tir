@@ -14,6 +14,7 @@ description = {
 dependencies = {
    "lua >= 5.1",
    "luaposix == 5.1.2",
+   "lua-zmq",
     "md5",
     "luajson",
     "lsqlite3",

@@ -11,11 +11,13 @@ all:
 
 install:
 	luarocks install lua_signal
-	curl -O https://github.com/iamaleksey/lua-zmq/raw/master/rockspecs/lua-zmq-scm-0.rockspec
-	luarocks install lua-zmq-scm-0.rockspec
-	curl -O https://github.com/jsimmons/mongrel2-lua/raw/master/rockspecs/mongrel2-lua-1.6.1.rockspec
-	luarocks install mongrel2-lua-1.6.1.rockspec
-	luarocks install http://tir.mongrel2.org/downloads/tir-${VERSION}-${REVISION}.rockspec
+	curl -O https://raw.github.com/jsimmons/tnetstrings.lua/master/rockspecs/tnetstrings-scm-0.rockspec
+	luarocks install tnetstrings-scm-0.rockspec
+	rm tnetstrings-scm-0.rockspec
+	curl -O https://raw.github.com/jsimmons/mongrel2-lua/master/rockspecs/mongrel2-lua-scm-0.rockspec
+	luarocks install mongrel2-lua-scm-0.rockspec
+	rm mongrel2-lua-scm-0.rockspec
+	luarocks install rockspec/tir-scm-0.rockspec
 
 build:
 	rm -rf tmp
