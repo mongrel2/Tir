@@ -51,7 +51,8 @@ CREATE TABLE server (id INTEGER PRIMARY KEY,
     default_host TEXT,
     name TEXT DEFAULT "",
     bind_addr TEXT DEFAULT "0.0.0.0",
-    port INTEGER);
+    port INTEGER,
+    use_ssl INTEGER DEFAULT 0);
 
 CREATE TABLE host (id INTEGER PRIMARY KEY,
     server_id INTEGER,
@@ -219,7 +220,7 @@ local WRITERS = {
     proxy = create_simple_writer('proxy', 'addr', 'port');
     dir = create_simple_writer('directory', 'base', 'index_file', 'default_ctype', 'cache_ttl');
     handler = create_simple_writer('handler', 'send_spec', 'send_ident', 'recv_spec', 'recv_ident', 'raw_payload', 'protocol');
-    server = create_simple_writer('server', 'uuid', 'access_log', 'error_log', 'chroot', 'pid_file', 'default_host', 'name', 'bind_addr', 'port');
+    server = create_simple_writer('server', 'uuid', 'access_log', 'error_log', 'chroot', 'pid_file', 'default_host', 'name', 'bind_addr', 'port', 'use_ssl');
 }
 
 function WRITERS.route(db, obj, state)
