@@ -20,6 +20,10 @@ function web(conn, main, req, stateless)
         stateless = stateless
     }
 
+	function Web:params()
+		return parse_form(self.req)
+	end
+
     function Web:path()
         return self.req.headers.PATH
     end
