@@ -1,3 +1,6 @@
+require 'posix'
+require 'tir.util'
+
 module('Tir', package.seeall)
 
 TEMPLATES = "views/"
