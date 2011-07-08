@@ -1,4 +1,4 @@
-require 'tir/engine'
+require 'tir.engine'
 
 local TEST_TEMPLATE = [[This is a {{ test }}.]]
 local ALL_ACTIONS = [[{% if test == 1 then %}{{ hello }}{% elseif test == 2 then %}{< hello >}{% else %}{( "tir-scm-0.rockspec" )}{% end %}]]

@@ -1,4 +1,4 @@
-require 'tir/engine'
+require 'tir.engine'
 
 local prompt_page = Tir.view("index.html")
 local link_page = Tir.view("link.html")

@@ -1,4 +1,4 @@
-require 'tir/engine'
+require 'tir.engine'
 require 'md5'
 
 local version, target, source_tar = unpack(arg)

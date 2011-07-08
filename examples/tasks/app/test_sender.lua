@@ -1,4 +1,4 @@
-require 'tir/engine'
+require 'tir.engine'
 
 local conn = Tir.Task.connect { spec = 'ipc://run/photos' }
 

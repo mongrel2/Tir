@@ -1,5 +1,5 @@
-require 'tir/testing'
-require 'app/arc_challenge'
+require 'tir.testing'
+require 'app.arc_challenge'
 
 context("Arc Challenge", function()
     context("interaction", function()

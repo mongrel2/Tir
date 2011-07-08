@@ -1,4 +1,4 @@
-require 'tir/engine'
+require 'tir.engine'
 
 local MULTIPART_BOUNDARY = "multipart/form-data; boundary=---------------------------21302070922692600111282794892"
 local MULTIPART_BODY = Tir.load_file("tests/data/", "multipart_sample.txt")

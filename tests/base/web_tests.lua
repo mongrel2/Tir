@@ -1,4 +1,4 @@
-require 'tir/engine'
+require 'tir.engine'
 
 local fake_conn = { 
     closed = false,

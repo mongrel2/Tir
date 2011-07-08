@@ -1,4 +1,4 @@
-require 'tir/engine'
+require 'tir.engine'
 
 
 context("Tir", function()

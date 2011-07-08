@@ -39,6 +39,7 @@ build = {
             ['tir.view'] = 'tir/view.lua',
             ['tir.web'] = 'tir/web.lua',
             ['tir.strict'] = 'tir/strict.lua',
+            ['tir.testing'] = 'tir/testing.lua',
             ["tir.mongrel2.init"] = "tir/mongrel2/init.lua",
             ["tir.mongrel2.connection"] = "tir/mongrel2/connection.lua",
             ["tir.mongrel2.request"]    = "tir/mongrel2/request.lua",
