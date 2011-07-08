@@ -6,7 +6,7 @@ This document is still a rough install guide, so you may have to wiggle the inst
 Pre-Requisites
 ==============
 
-Obviously, you'll need to <a href="http://mongrel2.org/wiki?name=GettingStarted">Install Mongrel2</a> first.
+Obviously, you'll need to <a href="http://mongrel2.org/wiki/quick_start.html">Install Mongrel2</a> first.
 
 You'll also need the following:
 
