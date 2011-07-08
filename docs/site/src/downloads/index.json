@@ -1,0 +1,19 @@
+{ 
+    'template': 'downloads.html',
+    "top": { "prev": "Home", "cur": "Downloads" },
+
+    "releases": [
+        { 
+            "version": "0.9.3",
+            "md5": "cd21b247adee9a39e3081d8a974b6146",
+            "link": "http://tir.mongrel2.org/downloads/tir-0.9.3-3.tar.gz",
+            "date": "Jul 08 2011"
+        },
+        { 
+            "version": "examples-0.9.3",
+            "md5": "e28f1a8048a268d7115129d88524d1ef",
+            "link": "http://tir.mongrel2.org/downloads/tir-examples-0.9.3-3.tar.gz",
+            "date": "Jul 08 2011"
+        },
+    ]
+}

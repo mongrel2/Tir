@@ -1,5 +1,5 @@
-VERSION=0.9
-REVISION=2
+VERSION=0.9.3
+REVISION=3
 SPEC_FILE=tir-${VERSION}-${REVISION}.rockspec
 TAR_FILE=tir-${VERSION}-${REVISION}.tar.gz
 SRC_ROCK=tir-${VERSION}-${REVISION}.src.rock
@@ -28,9 +28,9 @@ build:
 	lua tools/specgen.lua ${VERSION}-${REVISION} tmp/${SPEC_FILE} tmp/${TAR_FILE}
 
 dist: build
-	rsync -azv tmp/${TAR_FILE} tmp/${SPEC_FILE} tmp/${EXAMPLES_FILE} ${USER}@mongrel2.org:deployment/files/tir/downloads/
+	rsync -azv tmp/${TAR_FILE} tmp/${SPEC_FILE} tmp/${EXAMPLES_FILE} ${USER}@tir.mongrel2.org:/var/www/tir.mongrel2.org/downloads/
 	cd tmp && luarocks pack tir-${VERSION}-${REVISION}.rockspec
-	rsync -azv tmp/${SRC_ROCK} ${USER}@mongrel2.org:deployment/files/tir/downloads/
+	rsync -azv tmp/${SRC_ROCK} ${USER}@tir.mongrel2.org:/var/www/tir.mongrel2.org/downloads/
 
 clean:
 	rm -rf tmp

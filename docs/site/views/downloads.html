@@ -1,0 +1,41 @@
+<div id="main" class="blog">
+    <div class="inner-wrap clearfix">
+
+        <div class="content content-left">
+
+            {% for _, release in ipairs(releases) do %}
+            <article class="post post-blog clearfix">
+            <h3 class="post-title"><a href="{{ release.link }}">{{ release.version }}</a></h3>
+                <div class="post-meta">
+                    <span class="date">{{ release.date }}</span>
+                </div><!-- end .post-meta -->
+                <div class="post-content">
+                    Download the <a href="{{ release.link }}">tar.gz</a> source (MD5 {{ release.md5 }}).
+                </div>
+            </article><!-- end .post -->
+            <hr />
+            {% end %}
+        </div><!-- end .content -->
+
+
+        <div class="sidebar">
+            <div class="widget">
+                <h6>About Tir</h6>
+                <div class="widget-content">
+                    <p>
+                    Tir is a <a href="http://mongrel2.org">Mongrel2</a>
+                    project.
+                    </p>
+                </div><!-- end .widget-content -->
+            </div><!-- end .widget -->
+
+            <div class="widget">
+                <h6>Sponsors</h6>
+                <div class="widget-content">
+                    {( "sponsors_side.html" )}
+                </div><!-- end .widget-content -->
+            </div><!-- end .widget -->
+        </div><!-- end .sidebar -->
+
+    </div><!-- end .inner-wrap -->
+</div><!-- end #main -->
