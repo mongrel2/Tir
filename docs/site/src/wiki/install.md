@@ -28,9 +28,9 @@ sudo bash
 
 # install dependencies from git and places
 luarocks install lua_signal
-curl -O https://github.com/iamaleksey/lua-zmq/raw/master/rockspecs/lua-zmq-scm-0.rockspec
+curl -OL https://github.com/iamaleksey/lua-zmq/raw/master/rockspecs/lua-zmq-scm-0.rockspec
 luarocks install lua-zmq-scm-0.rockspec
-curl -O https://github.com/jsimmons/mongrel2-lua/raw/master/rockspecs/mongrel2-lua-1.6.1.rockspec
+curl -OL https://github.com/jsimmons/mongrel2-lua/raw/master/rockspecs/mongrel2-lua-1.6.1.rockspec
 luarocks install mongrel2-lua-1.6.1.rockspec
 
 # install tir
