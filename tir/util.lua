@@ -144,3 +144,17 @@ function load_lines(source, firstline, lastline)
 end
 
 
+-- Parses a cookie string into a table
+-- Note:  If the cookie string contains multiple cookies with the same key,
+-- only one of them will be returned in the resulting table
+function parse_cookie(cookie)
+	local cookie_str = string.gsub(cookie, "%s*;%s*", ";")   -- remove extra spaces
+  
+	local cookies = {}
+  
+	for k, v in string.gmatch(cookie_str, "([^;]+)=([^;]+)") do
+		cookies[k] = v
+	end
+
+	return cookies		
+end
