@@ -16,6 +16,9 @@ the code and if you want to help, then contact zedshaw-AT-zedshaw.com for more
 information.  The source to Tir is available at
 http://tir.mongrel2.org/downloads/tir-0.9-1.tar.gz.
 
+Install instructions and more information can be found on the Tir website at
+http://tir.mongrel2.org
+
 
 Tir's Philosophy
 ----------------

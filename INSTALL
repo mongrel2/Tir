@@ -5,10 +5,6 @@ this then you are using this at your own risk.
 
 INSTALL
 
-You need to have Lua 5.1, ZeroMQ, and LuaRocks installed.  Then do this:
-
-make install
-
-That should be it.  If you hit errors then let me know.
+Install instructions can be found on the Tir website here:  http://tir.mongrel2.org/wiki/install.html
 
 
