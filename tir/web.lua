@@ -47,11 +47,17 @@ function web(conn, main, req, stateless)
     end
 
     function Web:set_cookie(cookie)
-        self.req.headers['set-cookie'] = cookie
+        set_http_cookie(self.req, cookie)
+    end
+    
+    function Web:zap_cookie(cookie)
+    	cookie.expires = 0
+    	cookie.value = 'deleted' 
+    	set_http_cookie(self.req, cookie)
     end
 
-    function Web:get_cookie()
-        return self.req.headers['cookie']
+    function Web:get_cookies()
+        return parse_http_cookie(self.req.headers['cookie'])
     end
 
     function Web:session()

@@ -49,7 +49,13 @@ local function http_response(body, code, status, headers)
     
     local raw = {}
     for k, v in pairs(headers) do
-        insert(raw, format('%s: %s', k, v))
+    	if( "table" == type(v) ) then
+    		for l, w in pairs(v) do
+    			insert(raw, format('%s: %s', k, w))
+    		end
+    	else
+        	insert(raw, format('%s: %s', k, v))
+        end
     end
     
     return format(HTTP_FORMAT, code, status, concat(raw, '\r\n'), body)

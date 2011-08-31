@@ -36,18 +36,25 @@ end
 function make_expires()
     local temp = os.date("*t", os.time())
     temp.year = temp.year + BIG_EXPIRE_TIME
-    return os.date("%a, %d-%b-%Y %X GMT", os.time(temp))
+    return os.time(temp)
 end
 
 function make_session_cookie(ident)
-    return 'session="' .. (ident or make_session_id()) ..
-            '"; version=1; path=/; expires=' .. make_expires()
+	local cookie = {}
+	cookie.key = 'session'
+	cookie.value = ident or make_session_id()
+	cookie.version = 1
+	cookie.path = '/'
+	cookie.expires = make_expires()
+	return cookie
 end
 
 function parse_session_id(cookie)
     if not cookie then return nil end
 
-    return cookie:match('session="(APP-[a-z0-9\-]+)";?')
+	local cookie = parse_http_cookie(cookie)
+	
+	return cookie.session
 end
 
 
@@ -66,13 +73,11 @@ end
 
 function http_cookie_ident(req)
     local ident = parse_session_id(req.headers['cookie'])
-
     if not ident then
         ident = make_session_id()
         local cookie = make_session_cookie(ident)
 
-        req.headers['set-cookie'] = cookie
-        req.headers['cookie'] = cookie
+		set_http_cookie(req, cookie)
         req.session_id = ident
     end
 
