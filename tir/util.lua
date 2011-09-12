@@ -145,9 +145,10 @@ end
 
 
 -- Parses a cookie string into a table
--- Note:  If the cookie string contains multiple cookies with the same key,
+-- A given key will always be associated with a table containing 
+-- one or more assigned values.
+-- Note:  A cookie string may contain multiple cookies with the same key,
 -- (which can happen if similar cookies exist for different paths, domains, etc.)
--- the requested key will return a table containing each value
 function parse_http_cookie(cookie)
 	local cookies = {}
 
@@ -156,20 +157,12 @@ function parse_http_cookie(cookie)
 	local cookie_str = string.gsub(cookie, "%s*;%s*", ";")   -- remove extra spaces
   
 	for k, v in string.gmatch(cookie_str, "([^;]+)=([^;]+)") do
-		-- check if the key already exists
-		-- if it does, then set the value for the key to a table containing both values
+		-- if the key already exists,then just insert the new value
 		if( cookies[k] ) then
-			if( 'table' == type(cookies[k]) ) then
-				table.insert(cookies[k], v)
-			else
-				local values = {}
-				table.insert(values, cookies[k]) -- move the old value into a table
-				table.insert(values, v)
-				cookies[k] = values
-			end
-		-- otherwise, just set the key equal to the value
+			table.insert(cookies[k], v)
+		-- otherwise, assign the new key to a table containing the one new value
 		else
-			cookies[k] = v
+			cookies[k] = {v}
 		end
 	end
 
@@ -181,7 +174,7 @@ function set_http_cookie(req, cookie)
 	assert(cookie and cookie.key and cookie.value, "cookie.key and cookie.value are required")
 	--strip out cookie key/value delimiters
 	local key = string.gsub(cookie.key, "([=;]+)", "")
-	local value = string.gsub(cookie.value or '', "([=;]+)", "")
+	local value = string.gsub(cookie.value, "([=;]+)", "")
 	
 	local cookie_str = key .. '=' .. value
 	
