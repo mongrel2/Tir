@@ -54,7 +54,7 @@ function parse_session_id(cookie)
 
 	local cookie = parse_http_cookie(cookie)
 	
-	return cookie.session
+	return cookie.session[1]
 end
 
 
