@@ -20,7 +20,7 @@ function parse_args(arg)
     local last_opt = nil
 
     for i, opt in ipairs(arg) do
-        local token = opt:match("\-+([a-z\-]+)")
+        local token = opt:match("%-+([a-z%-]+)")
 
         if token then
             last_opt = token
