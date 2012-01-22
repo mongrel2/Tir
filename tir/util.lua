@@ -150,54 +150,55 @@ end
 -- Note:  A cookie string may contain multiple cookies with the same key,
 -- (which can happen if similar cookies exist for different paths, domains, etc.)
 function parse_http_cookie(cookie)
-	local cookies = {}
+    local cookies = {}
 
-	if( not cookie ) then return {} end
+    if not cookie then return {} end
 
-	local cookie_str = string.gsub(cookie, "%s*;%s*", ";")   -- remove extra spaces
-  
-	for k, v in string.gmatch(cookie_str, "([^;]+)=([^;]+)") do
-		-- if the key already exists,then just insert the new value
-		if( cookies[k] ) then
-			table.insert(cookies[k], v)
-		-- otherwise, assign the new key to a table containing the one new value
-		else
-			cookies[k] = {v}
-		end
-	end
+    local cookie_str = string.gsub(cookie, "%s*;%s*", ";")   -- remove extra spaces
 
-	return cookies		
+    for k, v in string.gmatch(cookie_str, "([^;]+)=([^;]+)") do
+        -- if the key already exists,then just insert the new value
+        if cookies[k] then
+            table.insert(cookies[k], v)
+        -- otherwise, assign the new key to a table containing the one new value
+        else
+            cookies[k] = {v}
+        end
+    end
+
+    return cookies		
 end
 
 function set_http_cookie(req, cookie)
-	--key and value are required, everything else is optional
-	assert(cookie and cookie.key and cookie.value, "cookie.key and cookie.value are required")
-	--strip out cookie key/value delimiters
-	local key = string.gsub(cookie.key, "([=;]+)", "")
-	local value = string.gsub(cookie.value, "([=;]+)", "")
-	
-	local cookie_str = key .. '=' .. value
-	
-	-- if no path is specified, use the root
-	cookie_str = cookie_str .. '; ' .. 'path=' .. (cookie.path or '/')
-	
-	if( cookie.domain ) then
-		cookie_str = cookie_str .. ';' .. 'domain=' .. cookie.domain
-	end
-	
-	if( cookie.expires ) then
-		assert("number" == type(cookie.expires), "expires value must be a number - UNIX epoch seconds")
-		cookie_str = cookie_str .. ';' .. 'expires=' .. os.date("%a, %d-%b-%Y %X GMT", cookie.expires)
-	end		
-	  
-	if( cookie.http_only ) then cookie_str = cookie_str .. '; httponly' end
-	
-	if( cookie.secure ) then cookie_str = cookie_str .. '; secure' end
-	
-	-- make sure we actually have a headers table before we go trying to set stuff
-	req.headers = req.headers or {}
-	-- make sure we have a set-cookie table to work with
-	req.headers['set-cookie'] = req.headers['set-cookie'] or {}
-	--insert the new cookie as a new set-cookie response header
-	table.insert(req.headers['set-cookie'], cookie_str)	
+    --key and value are required, everything else is optional
+    assert(cookie and cookie.key and cookie.value, "cookie.key and cookie.value are required")
+    --strip out cookie key/value delimiters
+    local key = string.gsub(cookie.key, "([=;]+)", "")
+    local value = string.gsub(cookie.value, "([=;]+)", "")
+    
+    local cookie_str = key .. '=' .. value
+    
+    -- if no path is specified, use the root
+    cookie_str = cookie_str .. '; ' .. 'path=' .. (cookie.path or '/')
+    
+    if cookie.domain then
+        cookie_str = cookie_str .. ';' .. 'domain=' .. cookie.domain
+    end
+    
+    if cookie.expires then
+        assert("number" == type(cookie.expires), "expires value must be a number - UNIX epoch seconds")
+        cookie_str = cookie_str .. ';' .. 'expires=' .. os.date("%a, %d-%b-%Y %X GMT", cookie.expires)
+    end		
+      
+    if cookie.http_only then cookie_str = cookie_str .. '; httponly' end
+    
+    if cookie.secure then cookie_str = cookie_str .. '; secure' end
+    
+    -- make sure we actually have a headers table before we go trying to set stuff
+    req.headers = req.headers or {}
+    -- make sure we have a set-cookie table to work with
+    req.headers['set-cookie'] = req.headers['set-cookie'] or {}
+    --insert the new cookie as a new set-cookie response header
+    table.insert(req.headers['set-cookie'], cookie_str)	
 end
+
