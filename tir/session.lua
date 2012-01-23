@@ -40,21 +40,21 @@ function make_expires()
 end
 
 function make_session_cookie(ident)
-	local cookie = {}
-	cookie.key = 'session'
-	cookie.value = ident or make_session_id()
-	cookie.version = 1
-	cookie.path = '/'
-	cookie.expires = make_expires()
-	return cookie
+    local cookie = {}
+    cookie.key = 'session'
+    cookie.value = ident or make_session_id()
+    cookie.version = 1
+    cookie.path = '/'
+    cookie.expires = make_expires()
+    return cookie
 end
 
 function parse_session_id(cookie)
     if not cookie then return nil end
 
-	local cookie = parse_http_cookie(cookie)
-	
-	return cookie.session
+    local cookie = parse_http_cookie(cookie)
+    
+    return cookie.session[1]
 end
 
 
@@ -77,7 +77,7 @@ function http_cookie_ident(req)
         ident = make_session_id()
         local cookie = make_session_cookie(ident)
 
-		set_http_cookie(req, cookie)
+        set_http_cookie(req, cookie)
         req.session_id = ident
     end
 
