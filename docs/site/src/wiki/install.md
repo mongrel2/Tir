@@ -36,7 +36,7 @@ curl -O https://raw.github.com/jsimmons/tnetstrings.lua/master/rockspecs/tnetstr
 luarocks install tnetstrings-scm-0.rockspec
 
 # install tir
-luarocks install http://tir.mongrel2.org/downloads/tir-0.9.3-3.rockspec
+luarocks install https://raw.github.com/zedshaw/Tir/master/rockspec/tir-0.9-3.rockspec
 
 # stop being root
 exit
