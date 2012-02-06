@@ -29,14 +29,14 @@ sudo bash
 # install dependencies from git and places
 luarocks install lua_signal
 
-curl -OL https://github.com/iamaleksey/lua-zmq/raw/master/rockspecs/lua-zmq-scm-0.rockspec
-luarocks install lua-zmq-scm-0.rockspec
+luarocks install lua-zmq
 
 curl -O https://raw.github.com/jsimmons/tnetstrings.lua/master/rockspecs/tnetstrings-scm-0.rockspec
 luarocks install tnetstrings-scm-0.rockspec
 
 # install tir
-luarocks install http://tir.mongrel2.org/downloads/tir-0.9.3-3.rockspec
+curl -O https://raw.github.com/zedshaw/Tir/master/rockspec/tir-0.9-3.rockspec
+luarocks install tir-0.9-3.rockspec
 
 # stop being root
 exit
