@@ -67,13 +67,18 @@ context("Tir", function()
 
         test("get_cookie", function()
             local web = Tir.web(fake_conn, fake_main, fake_req, false)
-            local cookie = web:get_cookie()
+
+            Tir.set_http_cookie(web.req, web.req.headers.cookie)
+            web.req.headers['cookie'] = web.req.headers['set-cookie'][1]
+            web.req.headers['set-cookie'] = nil
+
+            local cookie = web:get_cookies()
             assert_not_nil(cookie)
         end)
 
         test("set_cookie", function()
             local web = Tir.web(fake_conn, fake_main, fake_req, false)
-            web:set_cookie("testing")
+            web:set_cookie({key = "testing", value = ""})
             assert_not_nil(fake_req.headers['set-cookie'])
             fake_req.headers['set-cookie'] = nil
         end)

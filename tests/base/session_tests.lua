@@ -17,14 +17,17 @@ context("Tir", function()
         test("make_expires", function()
             local expire = Tir.make_expires()
             assert_not_nil(expire)
-            assert_match('^[A-Z][%w]-, %d%d%-[A-Z][%w]-%-%d%d%d%d %d%d:%d%d:%d%d GMT$', expire)
+            assert_equal("number", type(expire))
+            assert_match('^[A-Z][%w]-, %d%d%-[A-Z][%w]-%-%d%d%d%d %d%d:%d%d:%d%d GMT$', os.date("%a, %d-%b-%Y %X GMT", expire))
         end)
 
         test("make_session_cookie", function()
             local cookie = Tir.make_session_cookie(Tir.make_session_id())
             assert_not_nil(cookie)
 
-            assert_match("^session=.-; version=1; path=/; expires=.+$", cookie)
+            local req = {}
+            Tir.set_http_cookie(req, cookie)
+            assert_match("^session=.-; path=/; expires=.+$", req.headers['set-cookie'][1])
         end)
 
         test("json_ident", function()
@@ -38,8 +41,12 @@ context("Tir", function()
         end)
 
         test("http_cookie_ident", function()
-            local req = { headers = {
-                cookie = Tir.make_session_cookie(Tir.make_session_id())
+            local req = {}
+            Tir.set_http_cookie(req, Tir.make_session_cookie(Tir.make_session_id()))
+            local cookie_str = req.headers['set-cookie'][1]
+
+            req = { headers = {
+                cookie = cookie_str
             }}
 
             local ident = Tir.http_cookie_ident(req)
@@ -59,11 +66,14 @@ context("Tir", function()
                 assert_equal(req.data.session_id, ident)
             end
 
-
             do
                 local req = { headers = {
                     cookie = Tir.make_session_cookie(Tir.make_session_id())
                 }}
+
+                Tir.set_http_cookie(req, req.headers.cookie)
+                req.headers['cookie'] = req.headers['set-cookie'][1]
+                req.headers['set-cookie'] = nil
 
                 local ident = Tir.default_ident(req)
 
