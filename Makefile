@@ -4,20 +4,22 @@ SPEC_FILE=tir-${VERSION}-${REVISION}.rockspec
 TAR_FILE=tir-${VERSION}-${REVISION}.tar.gz
 SRC_ROCK=tir-${VERSION}-${REVISION}.src.rock
 EXAMPLES_FILE=tir-examples-${VERSION}-${REVISION}.tar.gz
+#LUAROCKS_ARGS="--local"
 
 all:
 	m2sh load -db tests/data/config.sqlite -config tests/data/mongrel2.conf
 	tir test
 
+.PHONY : install
 install:
-	luarocks install lua_signal
+	luarocks ${LUAROCKS_ARGS} install lua_signal
 	curl -O https://raw.github.com/jsimmons/tnetstrings.lua/master/rockspecs/tnetstrings-scm-0.rockspec
-	luarocks install tnetstrings-scm-0.rockspec
+	luarocks ${LUAROCKS_ARGS} install tnetstrings-scm-0.rockspec
 	rm tnetstrings-scm-0.rockspec
 	curl -O https://raw.github.com/jsimmons/mongrel2-lua/master/rockspecs/mongrel2-lua-scm-0.rockspec
-	luarocks install mongrel2-lua-scm-0.rockspec
+	luarocks ${LUAROCKS_ARGS} install mongrel2-lua-scm-0.rockspec
 	rm mongrel2-lua-scm-0.rockspec
-	luarocks install rockspec/tir-scm-0.rockspec
+	luarocks ${LUAROCKS_ARGS} install rockspec/tir-scm-0.rockspec
 
 build:
 	rm -rf tmp
