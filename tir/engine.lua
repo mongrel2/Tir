@@ -164,7 +164,11 @@ function start(config)
 
     config.allowed_methods_header = table.concat(allowed, ' ')
 
-    Tir.M2.load_config(config)
+    if config.config_db then Tir.M2.load_config(config) end
+
+    assert(config.sub_addr, "Failed to find sub_addr.")
+    assert(config.pub_addr, "Failed to find pub_addr.")
+
     local conn = assert(Tir.M2.connect(config), "Failed to connect to Mongrel2.")
 
     -- Run the engine
