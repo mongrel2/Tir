@@ -5,8 +5,9 @@ Tir is an experimental web framework for the [Mongrel2 webserver](http://mongrel
 programming language. The purpose of Tir is to play with the idea of a State
 Agnostic web framework. Tir lets you create handlers that work in various
 configurations as needed by your application requirements. You create your
-application using a natural_coroutine_style of handler, then make another part
-stateless, and still have other parts using an evented/callback_style.
+application using a [natural coroutine style](#natural-style) handler, 
+then make another part [stateless](#stateless-style), 
+and still have other parts using an [evented/callback style](#evented-style).
 
 Getting Started
 ---------------
@@ -46,8 +47,8 @@ interactions using the natural style very easily. For example, pagination is
 difficult in stateless servers, but it's just a repeat/until loop in natural
 style.
 By default, handlers are natural style and maintain a coroutine for each user
-and let you write your code using phrases like "prompt", "recv", "page", and
-"send".
+and let you write your code using phrases like `prompt`, `recv`, `page`, and
+`send`.
 
 <pre>
   local login_page = Tir.view("login.html")
@@ -104,7 +105,7 @@ Evented Style
 
 Tir also supports the alternative "evented" style, which means that URLs are
 mapped to callback functions in your handler. A simple URL pattern is used to
-transform your /Route/action style URLs into a function to call. Best of all,
+transform your `/Route/action` style URLs into a function to call. Best of all,
 evented operation can be combined with stateless (the default) or coroutines,
 so you can easily refactor complex URL schemes if you need:
 
@@ -132,7 +133,7 @@ so you can easily refactor complex URL schemes if you need:
   Tir.evented(Manage)
 </pre>
 
-In this style, Manage.form is run and then your handlers receive the results to
+In this style, `Manage.form` is run and then your handlers receive the results to
 work with right away. You can even change the routing pattern if you don't like
 what I've chosen, or need even more complexity in your life.
 
@@ -140,7 +141,7 @@ Simple Templating Language
 --------------------------
 
 Tir uses embedded Lua as it's templating language, which means you get a real
-language and not some crippled one someone smarter than you think you should be
+language and not some crippled one someone smarter than you thinks you should be
 using. And Lua already looks like most of the nice template languages out
 there:
 
@@ -161,7 +162,7 @@ Multiple Little Processes
 
 Tir also uses ZeroMQ and Mongrel2 to run the application as a set of small
 processes for each major routing, rather than one monolithic process. In the
-above two examples, each Tir.start line is a single process.
+above two examples, each `Tir.start` line is a single process.
 You can also build on this to flex and warp the size of your processes as you
 need, and locate them or cluster them however you like. By default it shoots
 for small little processes, but nothing prevents you from doing others.
@@ -169,7 +170,7 @@ for small little processes, but nothing prevents you from doing others.
 Builtin Background Tasks
 ------------------------
 
-Tir.Task lets you create and connect to ready to run 0MQ background task
+`Tir.Task` lets you create and connect to ready to run 0MQ background task
 processes so you can offload long running tasks and avoid holding up web
 requests. They're designed to be very easy to use, but still flexible enough to
 let you do what you need. By default they use PUB/SUB sockets, but you can
@@ -207,7 +208,8 @@ Unit Test Support
 -----------------
 
 New in 0.9, Tir now has decent unit testing in the tir/testing library and
-there's a sample test in the GettingStarted guide that shows how it's done.
+there's a sample test in the [Getting Started guide](http://tir.mongrel2.org/wiki/quick_start.html)
+that shows how it's done.
 
 Async Ready
 -----------
@@ -224,9 +226,9 @@ and there's plenty of options you can add.
 No Core
 -------
 
-This isn't really a Tir feature, but do you hate when there's bugs in your core
+This isn't really a Tir feature, but don't you hate it when there's bugs in your core
 libraries and that guy who "owns" the broken library refuses to fix it? Me too,
 that's why Lua and LuaRocks are awesome. You get a tight core language that's
-completely described in_a_few_HTML_pages and then install all the platform
+completely described in a few HTML pages, and can install all the platform
 libraries you need with LuaRocks.
 No more gatekeepers with Lua.
