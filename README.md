@@ -50,7 +50,7 @@ By default, handlers are natural style and maintain a coroutine for each user
 and let you write your code using phrases like `prompt`, `recv`, `page`, and
 `send`.
 
-<pre>
+```lua
   local login_page = Tir.view("login.html")
   local login_form = Tir.form { 'login_name', 'password'}
 
@@ -65,7 +65,7 @@ and let you write your code using phrases like `prompt`, `recv`, `page`, and
   end
 
   Tir.start {route='/Login', main=login}
-</pre>
+```
 
 
 Stateless Style
@@ -75,7 +75,7 @@ Handlers can be made "stateless" and they'll work like coroutine handlers, but
 not retain any state. These are good for one-shot operations and simpler
 actions that don't need much routing.
 
-<pre>
+```lua
   local search_page = Tir.view("search.html")
   local search_form = Tir.form {"q"}
 
@@ -98,7 +98,7 @@ actions that don't need much routing.
   end
 
   Tir.stateless {route='/Search', main=search}
-</pre>
+```
 
 Evented Style
 -------------
@@ -109,7 +109,7 @@ transform your `/Route/action` style URLs into a function to call. Best of all,
 evented operation can be combined with stateless (the default) or coroutines,
 so you can easily refactor complex URL schemes if you need:
 
-<pre>
+```lua
   local Manage = {
       form = Tir.form {"id", "action"}
   }
@@ -131,7 +131,7 @@ so you can easily refactor complex URL schemes if you need:
   }
 
   Tir.evented(Manage)
-</pre>
+```
 
 In this style, `Manage.form` is run and then your handlers receive the results to
 work with right away. You can even change the routing pattern if you don't like
@@ -145,7 +145,7 @@ language and not some crippled one someone smarter than you thinks you should be
 using. And Lua already looks like most of the nice template languages out
 there:
 
-<pre>
+```lua
   {% if #results &gt; 0 then %}
   &lt;ul&gt;
       {% for _,result in ipairs(results) do %}
@@ -155,7 +155,7 @@ there:
   {% else %}
   &lt;p&gt;We'll add "{{ q }}" as a new one.&lt;/p&gt;
   {% end %}
-</pre>
+```
 
 Multiple Little Processes
 -------------------------
@@ -179,7 +179,7 @@ of machines and nearly anything else you need to do. Messages are simply just
 JSON encoded Lua structures.
 Here's a Task that just dumps it's args.
 
-<pre>
+```lua
   require 'tir/engine'
 
   function test(args)
@@ -187,11 +187,11 @@ Here's a Task that just dumps it's args.
   end
 
   Tir.Task.start { main = test, spec = 'ipc://run/photos' }
-</pre>
+```
 
 And here's a sample Handler that can talk to it:
 
-<pre>
+```lua
   require 'tir/engine'
 
   local conn = Tir.Task.connect { spec = 'ipc://run/photos' }
@@ -202,7 +202,7 @@ And here's a sample Handler that can talk to it:
   end
 
   Tir.stateless {route='/Task', main=main}
-</pre>
+```
 
 Unit Test Support
 -----------------
