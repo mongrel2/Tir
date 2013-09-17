@@ -52,9 +52,9 @@ end
 function parse_session_id(cookie)
     if not cookie then return nil end
 
-    local cookie = parse_http_cookie(cookie)
-    
-    return cookie.session[1]
+    local session_cookie = parse_http_cookie(cookie).session
+    return session_cookie and session_cookie[1] or nil
+
 end
 
 
