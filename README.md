@@ -145,7 +145,7 @@ language and not some crippled one someone smarter than you thinks you should be
 using. And Lua already looks like most of the nice template languages out
 there:
 
-```lua
+```
   {% if #results &gt; 0 then %}
   &lt;ul&gt;
       {% for _,result in ipairs(results) do %}
