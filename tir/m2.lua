@@ -27,8 +27,8 @@ function load_config(config)
     assert(handler, "Failed to find route: " .. config.route ..
             ". Make sure you set config.host to a host in your mongrel2.conf.")
 
-    config.sub_addr = handler.send_spec
-    config.pub_addr = handler.recv_spec
+    config.sub_addr = config.sub_addr or handler.send_spec
+    config.pub_addr = config.pub_addr or handler.recv_spec
 end
 
 

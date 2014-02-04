@@ -19,6 +19,7 @@ dependencies = {
     "luajson",
     "lsqlite3",
     "telescope",
+    "tnetstrings",
 }
 build = {
     type = "none",

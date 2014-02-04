@@ -182,12 +182,12 @@ function set_http_cookie(req, cookie)
     cookie_str = cookie_str .. '; ' .. 'path=' .. (cookie.path or '/')
     
     if cookie.domain then
-        cookie_str = cookie_str .. ';' .. 'domain=' .. cookie.domain
+        cookie_str = cookie_str .. '; ' .. 'domain=' .. cookie.domain
     end
     
     if cookie.expires then
         assert("number" == type(cookie.expires), "expires value must be a number - UNIX epoch seconds")
-        cookie_str = cookie_str .. ';' .. 'expires=' .. os.date("%a, %d-%b-%Y %X GMT", cookie.expires)
+        cookie_str = cookie_str .. '; ' .. 'expires=' .. os.date("%a, %d-%b-%Y %X GMT", cookie.expires)
     end		
       
     if cookie.http_only then cookie_str = cookie_str .. '; httponly' end
