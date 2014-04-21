@@ -146,14 +146,14 @@ using. And Lua already looks like most of the nice template languages out
 there:
 
 ```lua
-  {% if #results &gt; 0 then %}
-  &lt;ul&gt;
+  {% if #results > 0 then %}
+  <ul>
       {% for _,result in ipairs(results) do %}
-      &lt;li&gt;{{ result }}&lt;/li&gt;
+      <li>{{ result }}</li>
       {% end %}
-  &lt;/ul&gt;
+  </ul>
   {% else %}
-  &lt;p&gt;We'll add "{{ q }}" as a new one.&lt;/p&gt;
+  <p>We'll add "{{ q }}" as a new one.</p>
   {% end %}
 ```
 
